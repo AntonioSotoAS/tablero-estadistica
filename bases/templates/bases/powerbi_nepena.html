@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} Jueces Listar :: Estadistica {% endblock %} </title>
+{% block wrapper %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4 pb-1">
+                <div class="user-profile-header d-flex flex-column flex-lg-row text-sm-start text-center">
+                    <img
+                        src="{% static "base/img/Icon/grafico_n.png" %}"
+                        alt="user image"
+                        class=" rounded p-3" width="95" height="90" />
+                    <div class="flex-grow-1 ">
+                        <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between justify-content-start mx-5 flex-md-row flex-column gap-4">
+                        <div class="user-profile-info pb-0">
+                            <h4 class="mb-0 mt-lg-6">Dashboard Juzgado de Nepeña</h4>
+                            <h6> <a href="{% url "bases:presidencia" %}">Tablero de Control </a><span> <a href="{% url "bases:estadistica_menu" %}">/ Estadística </a></span><span>/ Juzgado de Nepeña </span></h6>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-lg-12 col-sm-12 mb-3">
+                <iframe title="NEPENA" width="100%" height="600" 
+                    src="https://app.powerbi.com/view?r=eyJrIjoiZWVkYzAyOGMtMWY2Yy00NDc5LWFkMjYtOGY3YzFkYzYyZjM0IiwidCI6ImM0YTY2YzM0LTJiYjctNDUxZi04YmUxLWIyYzI2YTQzMDE1OCIsImMiOjR9"
+                    frameborder="0" allowFullScreen="true">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

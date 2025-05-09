@@ -1,0 +1,49 @@
+{% extends "base/base.html" %}
+
+<title>{% block title %} Grupos {% endblock %} </title>
+
+{% block body_container %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                
+                <div class="card-header bg-info font-weight-bold">
+                    {% if obj %} Editar Documento {% else %} Nuevo Documento {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="container-fluid">
+                            <div class="row">
+                                {% csrf_token %}
+
+                                <div class="col-6">
+                                    <label>Nombre Completo:</label>
+                                    {{form.first_name}}
+                                </div>
+                                
+                                <div class="col-12 mt-2">
+                                    <button type="submit" class="btn btn-success"> {% if obj %} Editar {% else %} Registrar {% endif %} </button>
+                                    <a href="{% url 'bases:user_list' %}" class="btn btn-secondary">Cancelar </a>
+                                </div>
+
+                                <!-- {{form.as_p}}-->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(document).ready(function(){
+      $('.table').DataTable();
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} Jueces Listar :: Estadistica {% endblock %} </title>
+{% block wrapper %}
+<body class="hold-transition layout-top-nav">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a href="{% url "bases:presidencia" %}">
+                <img src="{% static "base/img/csjsanta.png" %}" class="img-fluid" width="250">
+            </a>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <iframe title="MARATHON" width="100%" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiMTVlYzZiOTQtNmRiZC00M2VjLTliZDAtZDI4MWJhMjEzYWZkIiwidCI6ImM0YTY2YzM0LTJiYjctNDUxZi04YmUxLWIyYzI2YTQzMDE1OCIsImMiOjR9" frameborder="0" allowFullScreen="true"></iframe>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <!-- /.content -->
+    </div>
+    {% endblock %}

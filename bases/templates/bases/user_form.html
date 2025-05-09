@@ -1,0 +1,325 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% comment %} TITULO DE PÁGINA {% endcomment %}
+{% block title %} Nuevo Usuario {% endblock %}
+
+{% comment %} CUERPO DEL CONTENIDO {% endcomment %}
+{% block body_container %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mt-2">
+                <div class="col-md-4 col-xxl-4 mb-6">
+                    <div class="card h-100">
+                      <div class="card-body">
+
+                        {% if obj %}
+                        <div class=" rounded text-center mb-2 pt-4">
+                          <img class="img-fluid" src="{% static "base/img/images/editar.jpg" %}" alt="Editar" width="250" />
+                        </div>
+                        <h3 class="font-weight-bold mb-2 text-center">Editar Usuario</h3>
+                        {% else %}
+                        <div class=" rounded text-center mb-2 pt-4">
+                          <img class="img-fluid" src="{% static "base/img/inicio.jpg" %}" alt="Usuario Nuevo" width="250" />
+                        </div>
+                        <h3 class="font-weight-bold mb-2 text-center">Agregar Usuario</h3>
+                        {% endif %}
+                        <p>
+                          Ingrese la información del nuevo usuario.
+                        </p>
+                        <a href="{% url "bases:user_list" %}" class="btn rounded-pill btn-dark text-center">Regresar Listar Usuarios</a>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-8 mb-6">
+                  
+                  <div class="bs-stepper wizard-numbered mt-2">
+                    
+                    <div class="bs-stepper-header">
+                      <div class="step" data-target="#account-details">
+                        <button type="button" class="step-trigger">
+                          <span class="bs-stepper-circle">1</span>
+                          <span class="bs-stepper-label">
+                            <span class="bs-stepper-title">Información Personal</span>
+                            <span class="bs-stepper-subtitle">Agregar Información</span>
+                          </span>
+                        </button>
+                      </div>
+
+                      <div class="line">
+                        <i class="ti ti-chevron-right"></i>
+                      </div>
+
+                      <div class="step" data-target="#personal-info">
+                        <button type="button" class="step-trigger">
+                          <span class="bs-stepper-circle">2</span>
+                          <span class="bs-stepper-label">
+                            <span class="bs-stepper-title">Credenciales Usuario</span>
+                            <span class="bs-stepper-subtitle">Usuario y Password</span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="bs-stepper-content">
+                      <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- Account Details -->
+                        <div id="account-details" class="content">    
+                          <div class="row g-6">
+                            <div class="col-sm-6">
+                              <label class="form-label" for="username">Apellido Paterno:</label>
+                              <div class="input-group input-group-merge">
+                                <span id="basic-icon-default-fullname2" class="input-group-text"
+                                  ><i class="fa-regular fa-user"></i></i
+                                ></span>
+                                {{form.x_app_paterno}}
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <label class="form-label" for="username">Apellido Materno:</label>
+                              <div class="input-group input-group-merge">
+                                <span id="basic-icon-default-fullname2" class="input-group-text"
+                                  ><i class="fa-regular fa-user"></i></i
+                                ></span>
+                                {{form.x_app_materno}}
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <label class="form-label" for="username">Nombres:</label>
+                              <div class="input-group input-group-merge">
+                                <span id="basic-icon-default-fullname2" class="input-group-text"
+                                  ><i class="fa-regular fa-user"></i></i
+                                ></span>
+                                {{form.x_nombres}}
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <label class="form-label" for="username">DNI:</label>
+                              <div class="input-group input-group-merge">
+                                <span id="basic-icon-default-fullname2" class="input-group-text"><i class="fa-regular fa-address-card"></i></span>
+                                {{form.x_dni}}
+                              </div>
+                            </div>
+                            
+                            <div class="col-sm-6">
+                              <label class="form-label" for="email">Sexo</label>
+                                {{form.n_id_sexo}}
+
+                            </div>
+
+                            <div class="col-sm-6 form-password-toggle">
+                              <label class="form-label" for="password">Correo Electronico</label>
+                              <div class="input-group input-group-merge">
+                                <div class="input-group input-group-merge">
+                                  <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                                  {{form.email}}
+                                  <span id="basic-icon-default-email2" class="input-group-text">@example.com</span>
+                                </div>
+                                <div class="form-text">Puedes ingresar números y letras</div>
+                              </div>
+                            </div>
+
+                            <div class="col-sm-12 form-password-toggle mt-2">
+                              <label class="form-label" for="profile_image">Imagen de Perfil:</label>
+                              <div class="input-group input-group-merge">
+                                  <span id="basic-icon-default-profile" class="input-group-text">
+                                      <i class="fa-regular fa-image"></i>
+                                  </span>
+                                  {{ form.profile_image }}
+                              </div>
+                            </div>
+
+                            <div class="col-12 d-flex justify-content-between">
+                              <button class="btn btn-label-secondary btn-prev" disabled>
+                                <i class="ti ti-arrow-left ti-xs me-sm-2 me-0"></i>
+                                <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                              </button>
+                              
+                              <button type="button" class="btn btn-primary btn-next">
+                                <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
+                                <i class="ti ti-arrow-right ti-xs"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Personal Info -->
+                        <div id="personal-info" class="content">
+                          <div class="row g-6">
+                            <div class="col-sm-6">
+                              <label class="form-label" for="first-name">Usuario:</label>
+                              <div class="input-group input-group-merge">
+                                <span id="basic-icon-default-fullname2" class="input-group-text"
+                                  ><i class="ti ti-user"></i
+                                ></span>
+                                {{form.username}}
+                              </div>
+                            </div>
+                            {% if not obj %}
+                            <div class="col-sm-6">
+                              <label class="form-label" for="last-name">Contraseña:</label>
+                              <div class="input-group input-group-merge">
+                                <span id="basic-icon-default-fullname2" class="input-group-text"
+                                  ><i class="ti ti-user"></i
+                                ></span>
+                                {{form.password}}
+                              </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="col-12 d-flex justify-content-between">
+                              <button type="button" class="btn btn-label-secondary btn-prev">
+                                <i class="ti ti-arrow-left ti-xs me-sm-2 me-0"></i>
+                                <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                              </button>
+                              <button type="submit" class="btn btn-success">Enviar</button>
+                            </div>
+                          </div>
+                        </div>
+
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+
+        {% if obj %}
+        <div class="col-12">
+          <div class="row">
+              <div class="col-xl-6 col-12">
+                  <div class="card">
+                      <div class="card-header mb-0 pb-0">
+                        <h4 class="card-tittle font-weight-bold">GRUPOS ASIGNADOS</h4>
+                      </div>
+    
+                      <div class="card-body">
+                          <table class="table table-bordered">
+                              <thead>
+                                  <tr>
+                                      <th>ID</th>
+                                      <th>NOMBRE</th>
+                                      <th>ACCIONES</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for item in grupos_usuario %}
+                                  <tr>
+                                      <td>{{forloop.counter}}</td>
+                                      <td>{{item.name}}</td>
+                                      <td>
+                                          <a href="" class="btn btn-sm btn-cirlce btn-danger" onclick="permiso('{{item.id}}','DEL')">
+                                              <i class="far fa-trash-alt"></i>
+                                          </a>
+                                      </td>
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="col-xl-6 col-12">
+                  <div class="card">
+                      <div class="card-header pb-0 mb-0">
+                        <h4 class="card-tittle pb-0 mb-0 font-weight-bold">GRUPOS DISPONIBLES</h4>
+                      </div>
+
+                      <div class="card-body">
+                          <table class="table table-bordered">
+                              <thead>
+                                  <tr>
+                                      <th>ID</th>
+                                      <th>NOMBRE</th>
+                                      <th>ACCIONES</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for item in grupos %}
+                                  <tr>
+                                      <td>{{item.id}}</td>
+                                      <td class="text-uppercase">{{item.name}}</td>
+                                      <td>
+                                          <a href="#" type="button" class="btn btn-sm btn-success btn-circle" onclick="permiso('{{item.id}}','ADD')">
+                                              <i class="fas fa-plus"></i>
+                                          </a>
+                                      </td>
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% comment %} SCRIPT {% endcomment %}
+{% block script %}
+<script>
+    $(document).ready(function(){
+      $('.table').DataTable();
+    });
+
+    function permiso(id,accion){
+        var url = "/grupos/usuarios/{{obj.id}}/"+id
+        var token = '{{csrf_token}}'
+        var data = {"accion":accion}
+
+        console.log(url,token,data);
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                if (response.status === "success") {
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'success',
+                        title: response.title,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload(true);
+                    });
+                } else {
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'error',
+                        title: response.title,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+                Swal.fire({
+                    position: 'top-center',
+                    icon: 'error',
+                    title: 'Error',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        });
+    }
+
+    $(document).ready(function() {
+      $('#id_n_id_sexo').select2();  // Reemplaza con el ID del campo generado
+  });
+  </script>
+{% endblock %}

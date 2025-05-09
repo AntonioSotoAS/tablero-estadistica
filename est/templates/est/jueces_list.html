@@ -1,0 +1,435 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} Jueces Listar :: Estadistica {% endblock %} </title>
+
+{% block body_container %}
+
+{% comment %} ==========================================
+    MODAL PARA AGREGAR AL JUEZ
+========================================== {% endcomment %}
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Nuevo Juez</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <label for="x_nombre" class="form-label">Nombre de Juez</label>
+                            <select class="form-control select2" id="id_usuario" name="usuario">
+                                {% for user in usuarios %}
+                                    <option value="{{ user.id }}">{{ user.x_app_paterno|upper }} {{ user.x_app_materno|upper }} {{ user.x_nombres|upper }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                            <label for="id_n_id_juez_tipo" class="form-label">Tipo de Juez</label>
+                            <select id="id_n_id_juez_tipo" name="n_id_juez_tipo" class="form-control select2">
+                                {% for tipo in tipos_juez %}
+                                <option value="{{ tipo.n_id_juez_tipo }}">{{ tipo.x_descripcion|upper }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                    <button type="submit" class="btn btn-dark">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} ==========================================
+    MODAL PARA ELIMINAR AL JUEZ
+========================================== {% endcomment %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar Módulo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este módulo?</p>
+                <form method="POST" id="deleteForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="delete_id" name="delete_id">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} ==========================================
+    MODAL PARA ACTIVAR
+========================================== {% endcomment %}
+<div class="modal fade" id="activarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Activar Juez</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas <span class="font-weight-bold">ACTIVAR</span> este módulo?</p>
+                <form method="POST" id="activarForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="activar_id" name="activar_id">
+                    <button type="submit" class="btn btn-success">Activar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} ==========================================
+    MODAL PARA EDITAR AL JUEZ
+========================================== {% endcomment %}
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Módulo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <input type="hidden" id="edit_id">
+                            <label for="x_nombre" class="form-label">Nombre de Juez</label>
+                            <select class="form-control" id="id_usuario_editar" name="id_usuario_edit">
+                                {% for user in usuarios %}
+                                    <option value="{{ user.id }}">{{ user.x_app_paterno|upper }} {{ user.x_app_materno|upper }} {{ user.x_nombres|upper }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                            <label for="id_juez_tipo" class="form-label">Tipo de Juez</label>
+                            <select id="id_juez_tipo" name="id_juez_tipo_edit" class="form-control">
+                                {% for tipo in tipos_juez %}
+                                <option value="{{ tipo.n_id_juez_tipo }}">{{ tipo.x_descripcion|upper }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                    <button type="submit" class="btn btn-dark">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mt-2">
+                <div class="col-lg-6 mb-2">
+                    <div class="card">
+                        <div class="d-flex align-items-end row">
+                            <div class="col-7">
+                                <div class="card-body text-nowrap">
+                                    <h2 class="card-title mb-0 font-weight-bold">Listar Jueces</h2>
+                                    <p class="mb-2">Sistema de Estadistica / Listar Jueces</p>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                                        Agregar Juez
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-5 text-center text-sm-left">
+                                <div class="card-body pb-0 px-0 px-md-4">
+                                <img
+                                    src="{% static "base/img/images/juez.jpg" %}"
+                                    height="140"
+                                    alt="view sales"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 mb-2 col-xl-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between">
+                            <div class="content-left">
+                                <h3 class="font-weight-bold text-heading">Activos</h3>
+                                <div class="d-flex align-items-center my-1">
+                                    <h4 class=" mb-0 me-2">21,459</h4>
+                                </div>
+                                <small class="mb-0">Jueces Activos</small>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-primary">
+                                <img width="150" src="{% static "base/img/Icon/usuario.png" %}">
+                                </span>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 mb-2 col-xl-3">
+                    <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                        <div class="content-left">
+                            <h3 class="font-weight-bold text-heading">Inactivos</h3>
+                            <div class="d-flex align-items-center my-1">
+                            <h4 class="mb-0 me-2">4,567</h4>
+                            </div>
+                            <small class="mb-0">Jueces Inactivos </small>
+                        </div>
+                        <div class="avatar">
+                            <span class="avatar-initial rounded bg-label-danger">
+                                    <img class="img-fluid" width="90" src="{% static "base/img/Icon/user_inactivo.png" %}">
+                            </span>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Users List Table -->
+            <div class="card mt-3">
+                <div class="card-datatable table-responsive">
+                <table class="datatables-users table" id="tableUsuario">
+                    <thead class="border-top bg-dark">
+                    <tr>
+                        <th class="text-center text-white" style="font-size:14px">#</th>
+                        <th class="text-center text-white" style="font-size:14px">APELLIDOS Y NOMBRES</th>
+                        <th class="text-center text-white" style="font-size:14px">USUARIO</th>
+                        <th class="text-center text-white" style="font-size:14px">TIPO DE JUEZ</th>
+                        <th class="text-center text-white" style="font-size:14px">ESTADO</th>
+                        <th class="text-center text-white" style="font-size:14px">OPCIONES</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for dato in datos %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td class="text-uppercase">{{ dato.usuario__x_app_paterno }} {{ dato.usuario__x_app_materno }} {{ dato.usuario__x_nombres }}</td>
+                                <td class="text-center text-uppercase">{{ dato.usuario__username }}</td>
+                                <td class="text-uppercase text-center">{{ dato.n_id_juez_tipo__x_descripcion }}</td>
+                                
+                                <td class="text-center">
+                                    {% if dato.l_activo == "S" %}
+                                    <span class="text-success"><i class="fa-solid fa-circle-check "></i> ACTIVO </span>
+                                    {% else %}
+                                    <span class="text-danger"><i class="fas fa-close"> </i> INACTIVO</span>
+                                    {% endif %}
+                                </td> 
+                                    
+                                <td class="text-center">    
+                                    {% if dato.l_activo == "S" %}
+                                    <button class="btn btn-warning" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editModal" 
+                                            data-id="{{ dato.n_id_juez }}" 
+                                            data-usuario="{{ dato.usuario_id }}" 
+                                            data-tipo="{{ dato.n_id_juez_tipo_id }}">
+                                            <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal" 
+                                            data-id="{{ dato.n_id_juez }}">
+                                            <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-success" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#activarModal" 
+                                            data-id="{{ dato.n_id_juez }}">
+                                            <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}              
+                                    
+                                    
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center">No se encontraron resultados</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block datatable %}
+<script>
+    $(document).ready(function () {
+        $('#tableUsuario').DataTable({
+            "pageLength": 25,
+            "lengthMenu": [[25, 40, 50, 100, -1], [25, 40, 50, 100, "Todos"]],
+            autoWidth: false,
+            responsive: true,
+            dom: '<"row mb-3"<"col-md-3"l><"col-md-6 text-center"B><"col-md-3"f>>t<"row"<"col-md-6"i><"col-md-6"p>>',
+            buttons: [
+                {
+                    extend: 'collection',
+                    text: '<i class="fa fa-download"></i> Exportar Tabla',
+                    className: 'btn btn-danger mt-6',
+                    buttons: [
+                        { extend: 'print', text: '<i class="fa fa-print"></i> Imprimir' },
+                        { extend: 'csv', text: '<i class="fa fa-file-csv"></i> Archivo CSV' },
+                        { extend: 'excel', text: '<i class="fa fa-file-excel"></i> Archivo Excel' },
+                        { extend: 'pdf', text: '<i class="fa fa-file-pdf"></i> Archivo PDF' },
+                        { extend: 'copy', text: '<i class="fa fa-copy"></i> Copiar' }
+                    ]
+                }
+            ],
+            language: {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sSearch": "Buscar:",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            },
+        });
+    });
+</script>
+{% endblock  %}
+
+{% block script %}
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie("csrftoken");
+    
+    $.ajaxSetup({
+        headers: {
+            "X-CSRFToken": csrftoken,
+        },
+    });    
+
+    $("#createForm").submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{% url 'est:jueces_crear' %}",
+            method: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert("Error: " + JSON.stringify(response.errors));
+                }
+            }
+        });
+    });
+
+    // Editar módulo
+    $("#editModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget); // Botón que activó el modal
+        const id = button.data("id");
+        const usuarioId = button.data("usuario");
+        const tipoId = button.data("tipo");
+        console.log("Usuario ID:", id, "\n" , usuarioId); // Debug
+
+        $("#edit_id").val(id);
+        $("#id_usuario_editar").val(usuarioId).trigger("change");
+        $("#id_juez_tipo").val(tipoId).trigger("change");
+    });
+
+    $("#editForm").submit(function (e) {
+        e.preventDefault();
+        const id = $("#edit_id").val();
+        $.ajax({
+            url: `../Jueces/Editar/${id}/`,
+            method: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert("Error: " + JSON.stringify(response.errors));
+                }
+            }
+        });
+    });
+
+    $("#deleteModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data("id");
+        $("#delete_id").val(id);
+    });
+    
+    $("#deleteForm").submit(function (e) {
+        e.preventDefault();
+        const id = $("#delete_id").val();
+        $.ajax({
+            url: `../Jueces/Eliminar/${id}/`,
+            method: "POST",
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
+        });
+    });
+
+    $("#activarModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data("id");
+        $("#activar_id").val(id);
+    });
+    
+    $("#activarForm").submit(function (e) {
+        e.preventDefault();
+        const id = $("#activar_id").val();
+        $.ajax({
+            url: `../Jueces/Activar/${id}/`,
+            method: "POST",
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
+        });
+    });
+</script>
+{% endblock  %}

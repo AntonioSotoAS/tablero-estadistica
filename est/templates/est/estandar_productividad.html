@@ -1,0 +1,67 @@
+{% extends "base/base.html" %}
+
+<title>{% block title %} Cargos Poder Judicial {% endblock %} </title>
+
+{% block body_container %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-2">
+                <div class="card-header bg-dark font-weight-bold pb-0">
+                    <div class="card-title">
+                        <h3 class="font-weight-bold mb-0 pb-0">Estandar de Productividad </h3>
+                        <p class="card-text mt-0 pt-0">Sistema Estadistico / <span class="font-weight-bold"> Estandar de Productividad </span></p>
+                    </div>
+
+                    <div class="card-tools">
+                        <a href="#" class="btn btn-app bg-success">
+                            <i class="fas fa-plus"></i> Agregar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row table-responsive">
+                        <div class="col-12">
+                            <table class="table table-nowrap table-bordered table-striped">
+                                <thead class="bg-dark">
+                                    <tr>
+                                        <th class="text-center" style="font-size:14px">ID</th>
+                                        <th class="text-center" style="font-size:14px">INSTANCIA</th>
+                                        <th class="text-center" style="font-size:14px">ESTANDAR</th>
+                                        <th class="text-center" style="font-size:14px">RESOLUCIÓN</th>
+                                        <th class="text-center" style="font-size:14px">ESTADO</th>
+                                        <th class="text-center" style="font-size:14px">OPCIONES</th>
+                                    </tr>
+                                </thead>
+        
+                                <tbody>
+                                    {% for item in obj %}
+                                    <tr>
+                                        <td class="text-center">{{item.id}}</td>
+                                        <td>{{item.nombre}}</td>
+                                        <td class="text-center">{{item.fecha_creacion|date:"d/m/Y"}}</td>
+                                        <td class="text-center">{{item.fecha_edicion|date:"d/m/Y H:i:s"}}</td>
+                                        <td class="text-center">
+                                            {% if item.estado %}
+                                            <span class="badge badge-success"><i class="fas fa-check"></i></span>
+                                            {% else %}
+                                            <span class="badge badge-danger"><i class="fas fa-close"></i></span>
+                                            {% endif %}
+                                        </td>    
+                                        <td class="text-center">            
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

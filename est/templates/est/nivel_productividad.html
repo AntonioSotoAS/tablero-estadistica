@@ -1,0 +1,430 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} Nivel de Productividad {% endblock %} </title>
+
+{% block nav %}
+<nav style="padding: 40px 10px; height: 70px;"
+    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+    id="layout-navbar">
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+        <i class="ti ti-menu-2 ti-md"></i>
+        </a>
+    </div>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center ">
+        <div class="nav-item navbar-search-wrapper mb-0">
+            <img
+            src="{% static "base/img/Icon/grafico_n.png" %}"
+            alt="user image"
+            class=" rounded p-3" width="75" height="70" />
+            
+        </div>
+        <h2 class="d-none d-md-inline-block font-weight-bold pt-4">Nivel de Productividad <br></h2>
+        </div>
+
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a
+                class="nav-link dropdown-toggle hide-arrow p-0"
+                href=""
+                data-bs-toggle="dropdown">
+                <div class="avatar avatar-online">
+                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                <a class="dropdown-item mt-0" >
+                    <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-2">
+                        <div class="avatar avatar-online">
+                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
+                    </div>
+                    </div>
+                </a>
+                </li>
+                <li>
+                <div class="dropdown-divider my-1 mx-n2"></div>
+                </li>
+                <li>
+                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
+                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
+                </a>
+                </li>
+                <li>
+                <div class="d-grid px-2 pt-2 pb-1">
+                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
+                    <small class="align-middle">Cerrar Sesión</small>
+                    <i class="ti ti-logout ms-2 ti-14px"></i>
+                    </a>
+                </div>
+                </li>
+            </ul>
+        </li>
+        </ul>
+    </div>
+
+</nav>
+{% endblock  %}
+
+{% block body_container %}
+
+<div class="container mt-5">
+
+    <div class="row mt-5">
+        {% if resumenes %}
+            {% for resumen in resumenes %}
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                    <div class="card mb-4 shadow pb-6">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">{{ resumen.instancia }}</h5>
+
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-6 col-md-12 col-12 mb-3">
+                                    <div class="card {% if resumen.nivel_produc == "MUY BUENO" %}card-border-shadow-success{% elif resumen.nivel_produc == 'BUENO' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                                        <div class="d-flex align-items-center row">
+                                            <div class="col-6 text-center">
+                                                <div class="card-body mt-0 text-nowrap">
+                                                    <h5 class="card-title mb-0 mt-0 text-dark font-weight-bold">NIVEL DE <br>PRODUCTIVIDAD</h5>
+                                                    <h4 class="mb-0 pb-1">
+                                                        <span class="badge 
+                                                            {% if resumen.nivel_produc == "MUY BUENO" %}bg-success
+                                                            {% elif resumen.nivel_produc == 'BUENO' %}bg-warning text-dark
+                                                            {% else %}bg-danger{% endif %}">
+                                                            {{ resumen.nivel_produc }}
+                                                            </span>
+                                                        </h4>
+                                                        <a data-bs-toggle="modal"
+                                                        data-bs-target="#modalProductividad" class="text-center mt-0 pt-2">Más Información</a>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-6 d-flex align-items-start">
+                                                <div class="card-body d-flex align-items-start pt-0 mt-0">
+                                                    {% if resumen.nivel_produc == "MUY BUENO" %}
+                                                    <img src="{% static "base/img/Svg/medalla.svg" %}" height="140" alt="medalla">
+                                                    {% elif resumen.nivel_produc == "BUENO" %}
+                                                    <img src="{% static "base/img/Svg/medalla_plata.svg" %}" height="140" alt="medalla">
+                                                    {% else %}
+                                                    <img src="{% static "base/img/Svg/medalla_bronce.svg" %}" height="140" alt="medalla">
+                                                    {% endif %}
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        
+                                <div class="col-xl-4 col-lg-6 col-md-12 col-12 mb-3">
+                                    <div class="card {% if resumen.IER >= 90 %}card-border-shadow-success{% elif resumen.IER >= 50 %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                                        <div class="d-flex align-items-center row">
+                                        <div class="col-7 text-center">
+                                            <h5 class="mb-0 mt-0 text-center text-dark font-weight-bold">Indicador de Exp. Resueltos (IER)</h5>
+                                            <h4 class="mb-0 pb-1">
+                                                <span class="badge 
+                                                    {% if resumen.IER >= 90 %}bg-success
+                                                    {% elif resumen.IER >= 50 %}bg-warning text-dark
+                                                    {% else %}bg-danger{% endif %}">
+                                                    {{ resumen.IER }}%
+                                                </span>
+                                            </h4>
+                                            <a data-bs-toggle="modal"
+                                            data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
+                                        </div>
+                        
+                                        <div class="col-5 d-flex align-items-center justify-content-center">
+                                            <div class="card-body d-flex align-items-start pt-0 mt-0">
+                                            {% if resumen.IER >= 90 %}
+                                                <img src="{% static "base/img/Svg/subcarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                                            {% elif resumen.IER >= 50 %}
+                                                <img src="{% static "base/img/Svg/estandar.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                                            {% else %}
+                                                <img src="{% static "base/img/Svg/sobrecarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        </div>
+                                    
+                                    </div>
+                                </div>
+        
+                                <div class="col-xl-4 col-lg-6 col-md-12 col-12 mb-3">
+                                    <div class="card {% if resumen.situacion_carga == "SUBCARGA" %}card-border-shadow-success{% elif resumen.situacion_carga == 'ESTANDAR' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                                        <div class="row  d-flex align-items-center">
+                                        <div class="col-7 text-center">
+                                            <h5 class="mb-0 mt-0 text-center text-dark font-weight-bold">Situación de Carga en Trámite</h5>
+                                            <h4 class="mb-0 pb-1">
+                                                <span class="badge 
+                                                    {% if resumen.situacion_carga == "SUBCARGA" %}bg-success
+                                                    {% elif resumen.situacion_carga == 'ESTANDAR' %}bg-warning text-dark
+                                                    {% else %}bg-danger{% endif %}">
+                                                    {{ resumen.situacion_carga }}
+                                                </span>
+                                            </h4>
+                                            <a data-bs-toggle="modal"
+                                            data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
+                                        </div>
+                        
+                                        <div class="col-5 d-flex align-items-center justify-content-center">
+                                            <div class="card-body d-flex align-items-start pt-0 mt-0">
+                                            {% if resumen.situacion_carga == "SUBCARGA" %}
+                                                <img src="{% static "base/img/Svg/verde_subcarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                                            {% elif resumen.situacion_carga == "ESTANDAR" %}
+                                                <img src="{% static "base/img/Svg/ama_estandar.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                                            {% else %}
+                                                <img src="{% static "base/img/Svg/rojo_sobrecarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        </div>
+                                    
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                                    <div class="card mt-3">
+                                        <div class="card-header">
+                                        <h5 class="card-tittle font-weight-bold p-0 m-0">METAS Y AVANCE</h5>
+                                        </div>
+                
+                                        <div class="card-body pb-0">
+                                            <div class="row">
+                                                <div class="col-xxl-12 col-lg-12 col-md-12 mb-0 mt-3 pr-3">
+                                                    <ul class="p-0 m-0">
+                                                        <li class="mb-6 d-flex justify-content-between align-items-center">
+                                                        <div class="badge bg-label-dark rounded p-1_5"><i class="ti ti-star ti-md"></i></div>
+                                                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                                                            <h5 class="mb-0 ms-4">Estándar de Producción</h5>
+                                                            <div class="d-flex">
+                                                            <h5 class="mb-0">{{resumen.produccion}}</h5>
+                                                            </div>
+                                                        </div>
+                                                        </li>
+                                                        <li class="mb-6 d-flex justify-content-between align-items-center">
+                                                        <div class="badge bg-label-dark rounded p-1_5"><i class="ti ti-target-arrow ti-md"></i></div>
+                                                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                                                            <h5 class="mb-0 ms-4">Meta Proyectada</h5>
+                                                            <div class="d-flex">
+                                                            <h5 class="mb-0">{{resumen.meta_preliminar}}</h5>
+                                                            </div>
+                                                        </div>
+                                                        </li>
+                                                        <li class="mb-6 d-flex justify-content-between align-items-center">
+                                                        <div class="badge bg-label-dark rounded p-1_5"><i class="ti ti-books ti-md"></i></div>
+                                                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                                                            <h5 class="mb-0 ms-4">Carga Inicial (01-Ene-2025)</h5>
+                                                            <div class="d-flex">
+                                                            <h5 class="mb-0">{{resumen.carga_inicial}}</h5>
+                                                            </div>
+                                                        </div>
+                                                        </li>
+                                                        <li class="mb-6 d-flex justify-content-between align-items-center">
+                                                        <div class="badge bg-label-dark rounded p-1_5"><i class="ti ti-file ti-md"></i></div>
+                                                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                                                            <h5 class="mb-0 ms-4">Expedientes Ingresados Totales</h5>
+                                                            <div class="d-flex">
+                                                            <h5 class="mb-0">{{resumen.ingresos}}</h5>
+                                                            </div>
+                                                        </div>
+                                                        </li>
+                                                        <li class="mb-6 d-flex justify-content-between align-items-center">
+                                                        <div class="badge bg-label-dark rounded p-1_5"><i class="ti ti-file-check ti-md"></i></div>
+                                                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                                                            <h5 class="mb-0 ms-4">Expedientes Resueltos Totales</h5>
+                                                            <div class="d-flex">
+                                                            <h5 class="mb-0">{{resumen.resueltos}}</h5>
+                                                            </div>
+                                                        </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </div>
+                                
+                                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                                    <!-- ID único para el gráfico -->
+                                    <div class="porcentaje-marcador" style="padding:0px;margin:0px" id="grafico-media-luna-{{ forloop.counter }}"></div>
+                                    
+                                    <!-- Texto centrado dentro del gráfico -->
+                                    <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                        <div style="font-size: 30px; font-weight: bold;">{{ resumen.avance_meta|floatformat:2 }}%</div>
+                                        <div style="font-size: 20px; color: #666;">Avance de Meta</div>
+                                    </div>
+                                    
+                                    <!-- Meta Ideal con `forloop.counter` -->
+                                    <h5 class="text-center mt-0 pt-0">Porcentaje de Meta Ideal: {{ resumen.ideal_meta|floatformat:2 }}%</h5>
+                                </div> 
+                                
+                                
+
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No hay datos disponibles para el día anterior.</p>
+        {% endif %}
+    </div>
+    
+    <div class="row mt-3">
+        <div class="col-12 ">
+            <div class="card">
+                {% for instancia, datos in resumen_por_instancia.items %}
+                    <div class="card-header pb-0">
+                        <h5 class="card-title">{{ instancia }}</h5>
+                    </div>
+                    
+                    <div class="card-body table-responsive ">
+                        <table class="table  table-nowrap">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="text-white text-center">MES</th>
+                                    <th class="text-white text-center">ENE</th>
+                                    <th class="text-white text-center">FEB</th>
+                                    <th class="text-white text-center">MAR</th>
+                                    <th class="text-white text-center">ABR</th>
+                                    <th class="text-white text-center">MAY</th>
+                                    <th class="text-white text-center">JUN</th>
+                                    <th class="text-white text-center">JUL</th>
+                                    <th class="text-white text-center">AGO</th>
+                                    <th class="text-white text-center">SET</th>
+                                    <th class="text-white text-center">OCT</th>
+                                    <th class="text-white text-center">NOV</th>
+                                    <th class="text-white text-center">DIC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ingresos</td>
+                                    {% for mes in datos.ingresos %}
+                                    <td class="text-center">{{ mes }}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>Resueltos</td>
+                                    {% for mes in datos.resueltos %}
+                                    <td class="text-center">{{ mes }}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block datatable %}
+
+{% endblock  %}
+
+{% block script %}
+<script>
+// Generar gráfico con Chart.js
+setTimeout(() => {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Expedientes Ingresados', 'Expedientes Resueltos'],
+        datasets: [{
+          label: 'Expedientes',
+          data: [item.m_t_ingreso, item.m_t_resuelto],
+          backgroundColor: ['#4e73df', '#1cc88a']
+        }]
+      },
+      options: {
+        indexAxis: 'x', // ← Esto convierte la gráfica en horizontal
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Gráfica de Expedientes Totales Ingresados vs Totales Resueltos'
+          },
+          datalabels: {
+            anchor: 'center',
+            align: 'center',
+            color: '#fff',
+            font: {
+              weight: 'bold',
+              size: 16
+            },
+            formatter: Math.round
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true
+          }
+        }
+      },
+      plugins: [ChartDataLabels] 
+    });
+  }, 100);
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    
+        {% for resumen in resumenes %}
+            const avanceMeta{{ forloop.counter }} = parseFloat('{{ resumen.avance_meta|floatformat:2 }}'.replace(',', '.'));
+            const idealMeta{{ forloop.counter }} = parseFloat('{{ resumen.ideal_meta|floatformat:2 }}'.replace(',', '.'));
+            const color{{ forloop.counter }} = avanceMeta{{ forloop.counter }} >= idealMeta{{ forloop.counter }} ? '#28a745' : '#dc3545';
+
+            var options{{ forloop.counter }} = {
+                series: [avanceMeta{{ forloop.counter }}],
+                chart: {
+                    height: 350,
+                    type: 'radialBar'
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -2,
+                        endAngle: 360,
+                        hollow: {
+                            size: '65%'
+                        },
+                        dataLabels: {
+                            show: false, // Ocultar etiquetas predeterminadas
+                            value: {
+                                color: color{{ forloop.counter }},
+                                fontSize: '24px',
+                                offsetY: -50
+                            }
+                        },
+                        track: {
+                            background: '#f0f0f0',
+                            strokeWidth: '100%'
+                        }
+                    }
+                },
+                fill: {
+                    colors: [color{{ forloop.counter }}]
+                },
+                labels: ['Avance de Meta']
+            };
+
+            var chart{{ forloop.counter }} = new ApexCharts(
+                document.querySelector("#grafico-media-luna-{{ forloop.counter }}"),
+                options{{ forloop.counter }}
+            );
+            chart{{ forloop.counter }}.render();
+        {% endfor %}
+    });
+</script>
+{% endblock %}

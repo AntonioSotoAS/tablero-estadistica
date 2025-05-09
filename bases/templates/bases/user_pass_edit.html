@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+
+{% block body_container %}
+<div class="container mt-5">
+    <h2>Cambiar Contraseña</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+      </div>
+      <div class="mb-3">
+        {{ form.new_password1.label_tag }}
+        {{ form.new_password1 }}
+      </div>
+      <div class="mb-3">
+        {{ form.new_password2.label_tag }}
+        {{ form.new_password2 }}
+      </div>
+      <button type="submit" class="btn btn-danger">Actualizar Contraseña</button>
+    </form>
+  </div>
+{% endblock %}

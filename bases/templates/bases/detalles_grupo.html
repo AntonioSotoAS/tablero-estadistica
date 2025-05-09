@@ -1,0 +1,192 @@
+{% extends "base/base.html" %}
+
+<title>{% block title %} Grupos {% endblock %} </title>
+
+{% block body_container %}
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-2">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-10">
+                            <h3 class="font-weight-bold mb-0 pb-0">Grupos de Permisos</h3>
+                        </div>
+                    </div>
+ 
+                    
+                    <p class="card-text mt-0 pt-0">Sistema Estadistico / Usuarios / <span class="font-weight-bold">Grupo de Permisos </span></p>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header mb-0 pb-0">
+                    <h4 class="card-tittle font-weight-bold">{% if obj %} Editar Grupo {% else %} Nuevo Grupo {% endif %}</h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="container-fluid">
+                            <div class="row">
+                                {% csrf_token %}
+
+                                <div class="col-12">
+                                    <label>Nombre del Grupo:</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{obj.name}}">
+                                </div>
+                                
+                                <div class="col-12 mt-2">
+                                    <button type="submit" class="btn btn-success"> {% if obj %} Editar {% else %} Registrar {% endif %} </button>
+                                    <a href="{% url 'bases:group_list' %}" class="btn btn-secondary">Cancelar </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if obj %}
+    <div class="row mt-3 mb-3">
+        <div class="col-xl-6 col-12">
+            <div class="card">
+
+                <div class="card-header font-weight-bold mb-0 pb-0">
+                    <h5 class="font-weight-bold mb-0 pb-0">PERMISOS DEL GRUPO {{obj}}</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row table-responsive">
+                        <div class="col-12">
+                            <table class="table table-nowrap table-bordered">
+                                <thead class="bg-dark">
+                                    <tr>
+                                        <th class="text-center text-white" style="font-size:14px">ID</th>
+                                        <th class="text-center text-white" style="font-size:14px">NOMBRE DE GRUPO</th>
+                                        <th class="text-center text-white" style="font-size:14px">ACIONES</th>
+                                    </tr>
+                                </thead>
+        
+                                <tbody>
+                                    {% for item in permisos_grupo %}
+                                    <tr>
+                                        <td class="text-center">{{forloop.counter}}</td>
+                                        <td>{{item.name}}</td>
+                                        <td class="text-center">                  
+                                            <a href="" class="btn btn-sm text-success" onclick="permiso('{{item.id}}','DEL')",><button class="btn btn-circle btn-danger"><i class="fas fa-trash"></i></button></a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-12">
+            <div class="card">
+                <div class="card-header font-weight-bold mb-0 pb-0">
+                    <h5 class="font-weight-bold mb-0 pb-0">PERMISOS DISPONIBLES</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row table-responsive">
+                        <div class="col-12">
+                            <table class="table table-nowrap table-bordered">
+                                <thead class="bg-dark">
+                                    <tr>
+                                        <th class="text-center text-white" style="font-size:14px">ID</th>
+                                        <th class="text-center text-white" style="font-size:14px">NOMBRES</th>
+                                        <th class="text-center text-white" style="font-size:14px">ACCIONES</th>
+                                    </tr>
+                                </thead>
+        
+                                <tbody>
+                                    {% for item in permisos %}
+                                    <tr>
+                                        <td class="text-center">{{item.id}}</td>
+                                        <td>{{item.name}}</td>
+                                        <td class="text-center">                  
+                                            <!-- <a href=""><button class="btn btn-circle btn-warning"><i class="fas fa-edit"></i></button></a> -->
+                                            <a href="#" onclick="permiso('{{item.id}}','ADD')"><i class="fas fa-plus"></i></a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(document).ready(function(){
+      $('.table').DataTable();
+    });
+
+    function permiso(id,accion){
+        var url = "/grupos/permisos/{{obj.id}}/"+id
+        var token = '{{csrf_token}}'
+        var data = {"accion":accion}
+
+        console.log(url,token,data);
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                if (response.status === "success") {
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'success',
+                        title: response.title,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload(true);
+                    });
+                } else {
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'error',
+                        title: response.title,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+                Swal.fire({
+                    position: 'top-center',
+                    icon: 'error',
+                    title: 'Error',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        });
+    }
+  </script>
+{% endblock %}

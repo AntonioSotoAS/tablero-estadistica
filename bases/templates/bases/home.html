@@ -1,0 +1,487 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+INICIO :: CORTE DEL SANTA
+{% endblock  %}
+
+{% block nav %}
+<nav style="padding: 40px 10px; height: 70px;"
+    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+    id="layout-navbar">
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+        <i class="ti ti-menu-2 ti-md"></i>
+        </a>
+    </div>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center ">
+        <div class="nav-item navbar-search-wrapper mb-0">
+            <img
+            src="{% static "base/img/Icon/grafico_n.png" %}"
+            alt="user image"
+            class=" rounded p-3" width="75" height="70" />
+            
+        </div>
+        <h2 class="d-none d-md-inline-block font-weight-bold pt-4">Sistema Estadistico <br></h2>
+        </div>
+
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a
+                class="nav-link dropdown-toggle hide-arrow p-0"
+                href=""
+                data-bs-toggle="dropdown">
+                <div class="avatar avatar-online">
+                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                <a class="dropdown-item mt-0" >
+                    <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-2">
+                        <div class="avatar avatar-online">
+                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
+                    </div>
+                    </div>
+                </a>
+                </li>
+                <li>
+                <div class="dropdown-divider my-1 mx-n2"></div>
+                </li>
+                <li>
+                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
+                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
+                </a>
+                </li>
+                <li>
+                <div class="d-grid px-2 pt-2 pb-1">
+                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
+                    <small class="align-middle">Cerrar Sesión</small>
+                    <i class="ti ti-logout ms-2 ti-14px"></i>
+                    </a>
+                </div>
+                </li>
+            </ul>
+        </li>
+        </ul>
+    </div>
+
+    <!-- Search Small Screens -->
+    <div class="navbar-search-wrapper search-input-wrapper d-none">
+        <input
+        type="text"
+        class="form-control search-input container-xxl border-0"
+        placeholder="Search..."
+        aria-label="Search..." />
+        <i class="ti ti-x search-toggler cursor-pointer"></i>
+    </div>
+</nav>
+{% endblock  %}
+
+{% block body_container %}
+<style>
+  .porcentaje-marcador {
+    padding: 0; /* Elimina cualquier padding */
+    margin: 0 auto; /* Centra el texto si es necesario */
+    line-height: 1; /* Ajusta el espaciado vertical */
+    display: flex; /* Asegura que el elemento se comporte como un contenedor flexible */
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: center; /* Centra el contenido horizontalmente */
+  }
+
+  #grafico-media-luna {
+    margin: 0;
+    padding: 0;
+    display: flex; /* Opcional, asegura que el contenido se ajuste */
+    justify-content: center; /* Centra el contenido */
+    align-items: center; /* Centra el contenido */
+}
+</style>
+
+<section class="content">
+    <div class="container-xxl flex-grow-1 container-p-y">
+
+      <div class="row mt-3"> 
+        <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-9 order-0 ">
+          <div class="row">
+            {% comment%} CARD DE BIENVENIDA {% endcomment %}
+            <div class="col-xl-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-end row">
+                    <div class="col-12 col-sm-12 col-md-2 col-lg-5 col-xl-4 col-xxl-4 d-flex align-items-center">
+                        <img src="{{ user.profile_image.url }}" alt="Imagen de perfil" class="img-circle img-fluid mx-auto d-block d-flex align-items-center w-50">
+                    </div>
+
+                    <div class="col-12 col-sm-12 col-md-10 col-lg-7 col-xl-8 col-xxl-8">
+                        <h4 class="card-title text-dark font-weight-bold">Bienvenido <br>{{user.x_nombres}} {{user.x_app_paterno}} {{user.x_app_materno}}!</h4>
+                        
+                        <p class="mb-4" style="text-align: justify;">
+                          {% if perms.est.list_mae_est_modulos %}
+                          Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control, que le permitirá monitorear el estado general de las operaciones. Hacer seguimiento detallado a las actividades de las Juzgados, y a las oficinas de Logística y Presupuesto, para asegurar un control eficiente y oportuno.
+                          {% elif perms.est.list_mae_est_jueces %}
+                          El Sistema estadistico, el cual analiza con las herramientas disponibles para obtener información de los indicadores y el nivel de productividad de los juzgados.
+                          {% elif perms.est.list_mae_est_organo_jurisdiccionales %}
+                          Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control. Podrá consultar las actividades de los Juzgados para asegurar un control eficiente y oportuno.
+                          {% else %}
+                          Bievenido al Sistema Estadistico
+                          {% endif %}
+                        </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
+          <div class="card mb-2">
+            <div class="card-header align-items-center text-center pb-1">
+              <img src="{% static "base/img/Icon/reloj_n.png" %}" class="img-fluid w-25 mb-2 mx-auto d-block">
+              <span class="text-center badge bg-danger bg-glow mt-2 mb-2">Última Actualización de Datos</span>
+              <h4>{{ f_fecha_mod }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if perms.est.list_mae_est_modulos %}
+        {% comment%} =============================================
+        PRESIDENTE - PANEL DE CONTROL
+        ========================================== {% endcomment %}
+        <div class="row mt-3">
+          <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="{% url "est:estadistica_menu" %}">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/img/Icon/grafico_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Estadística</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="{% url "est:logistica_menu" %}">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/Img/Icon/logistica_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Logística</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="{% url "est:presupuesto_menu" %}">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/Img/Icon/presupuesto_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Presupuesto</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="{% url "est:depositos_menu" %}">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/Img/Icon/deposito_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                  <h5 class="mb-0 text-center">Depósitos</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="C:\Program Files (x86)\iVMS-4200 Site\iVMS-4200 Client\Server>iVMS-4200.Framework.S.exe">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/img/Icon/camara_black.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Cámaras</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="{% url "est:power_sinoe" %}">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/img/Icon/notificacion_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Sinoe</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+
+        </div>
+      {% endif %}
+
+      {% if perms.est.list_mae_est_jueces %}
+        {% comment%} =============================================
+        INFORMACIÓN DE JUEZ
+        ========================================== {% endcomment %}
+        <div class="row mt-3"> 
+
+          {% if resumenes %}
+          {% for resumen in resumenes %}
+              <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <div class="card mb-4 shadow">
+                  <div class="card-body pb-0">
+                      <h5 class="card-title">{{ resumen.instancia }}</h5>
+                      <div class="porcentaje-marcador" style="padding:0px;margin:0px" id="grafico-media-luna"></div>
+                      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <div style="font-size: 30px; font-weight: bold;">{{ avance_meta|floatformat:2 }}%</div>
+                        <div style="font-size: 20px; color: #666;">Avance de Meta</div>
+                    </div>
+                    <h5 class="text-center mt-0 pt-0">Porcentaje de Meta Ideal: {{resumen.ideal_meta}}% </h5>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xl-8 col-lg-6 col-md-6 col-sm-12">
+                <div class="row">
+                  <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
+                    <div class="card {% if resumen.nivel_produc == "MUY BUENO" %}card-border-shadow-success{% elif resumen.nivel_produc == 'BUENO' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                      <div class="d-flex align-items-center row">
+                        <div class="col-7 text-center">
+                            <div class="card-body mt-0 text-nowrap">
+                                <h5 class="card-title mb-0 mt-0 text-dark font-weight-bold">NIVEL DE PRODUCTIVIDAD</h5>
+                                <h4 class="mb-0 pb-1">
+                                    <span class="badge 
+                                        {% if resumen.nivel_produc == "MUY BUENO" %}bg-success
+                                        {% elif resumen.nivel_produc == 'BUENO' %}bg-warning text-dark
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ resumen.nivel_produc }}
+                                      </span>
+                                    </h4>
+                                    <a data-bs-toggle="modal"
+                                    data-bs-target="#modalProductividad" class="mt-0 pt-2">Más Información</a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-5 d-flex align-items-start">
+                            <div class="card-body d-flex align-items-start pt-0 mt-0">
+                              {% if resumen.nivel_produc == "MUY BUENO" %}
+                                <img src="{% static "base/img/Svg/medalla.svg" %}" height="140" alt="medalla">
+                              {% elif resumen.nivel_produc == "BUENO" %}
+                                <img src="{% static "base/img/Svg/medalla_plata.svg" %}" height="140" alt="medalla">
+                              {% else %}
+                                <img src="{% static "base/img/Svg/medalla_bronce.svg" %}" height="140" alt="medalla">
+                                {% endif %}
+                                
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
+                    <div class="card {% if resumen.IER >= 90 %}card-border-shadow-success{% elif resumen.IER >= 50 %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                      <div class="d-flex align-items-center row">
+                        <div class="col-7 text-center">
+                            <h5 class="mb-0 mt-0 text-center text-dark font-weight-bold">Indicador de Exp. Resueltos (IER)</h5>
+                            <h4 class="mb-0 pb-1">
+                              <span class="badge 
+                                  {% if resumen.IER >= 90 %}bg-success
+                                  {% elif resumen.IER >= 50 %}bg-warning text-dark
+                                  {% else %}bg-danger{% endif %}">
+                                  {{ resumen.IER }}%
+                              </span>
+                            </h4>
+                            <a data-bs-toggle="modal"
+                            data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
+                        </div>
+      
+                        <div class="col-5 d-flex align-items-center justify-content-center">
+                          <div class="card-body d-flex align-items-start pt-0 mt-0">
+                            {% if resumen.IER >= 90 %}
+                              <img src="{% static "base/img/Svg/subcarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                            {% elif resumen.IER >= 50 %}
+                              <img src="{% static "base/img/Svg/estandar.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                            {% else %}
+                              <img src="{% static "base/img/Svg/sobrecarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                              {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    
+                    </div>
+                  </div>
+
+                  <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
+                    <div class="card {% if resumen.situacion_carga == "SUBCARGA" %}card-border-shadow-success{% elif resumen.situacion_carga == 'ESTANDAR' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                      <div class="row  d-flex align-items-center">
+                        <div class="col-7 text-center">
+                            <h5 class="mb-0 mt-0 text-center text-dark font-weight-bold">SITUACIÓN DE CARGA EN TRÁMITE</h5>
+                            <h4 class="mb-0 pb-1">
+                              <span class="badge 
+                                  {% if resumen.situacion_carga == "SUBCARGA" %}bg-success
+                                  {% elif resumen.situacion_carga == 'ESTANDAR' %}bg-warning text-dark
+                                  {% else %}bg-danger{% endif %}">
+                                  {{ resumen.situacion_carga }}
+                              </span>
+                            </h4>
+                            <a data-bs-toggle="modal"
+                            data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
+                        </div>
+      
+                        <div class="col-5 d-flex align-items-center justify-content-center">
+                          <div class="card-body d-flex align-items-start pt-0 mt-0">
+                            {% if resumen.situacion_carga == "SUBCARGA" %}
+                              <img src="{% static "base/img/Svg/verde_subcarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                            {% elif resumen.situacion_carga == "ESTANDAR" %}
+                              <img src="{% static "base/img/Svg/ama_estandar.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                            {% else %}
+                              <img src="{% static "base/img/Svg/rojo_sobrecarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
+                              {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    
+                    </div>
+                  </div>
+                </div>
+              </div>
+          {% endfor %}
+      {% else %}
+          <p class="text-muted">No hay datos disponibles para el día anterior.</p>
+      {% endif %}
+        </div>
+
+        <div class="modal fade" id="modalProductividad" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalCenterTitle">Información Nivel de Productividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <button type="button" class="btn rounded-pill btn-danger">BAJO</button> Si el nivel de productividad esta entre 0 y 74 Bajo 
+                  </div>
+
+                  <div class="col-12 mb-2">
+                    <button type="button" class="btn rounded-pill btn-warning">BUENO</button> Si el nivel de productividad esta entre 75 y 87 
+                  </div>
+
+                  <div class="col-12">
+                    <button type="button" class="btn rounded-pill btn-success">MUY BUENO</button> Si el nivel de productividad esta entre 88 a más
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="modalEstandar" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content ">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalCenterTitle">Información Nivel de Productividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <table class="table table-bordered">
+                      <thead>
+                        <th>Condición</th>
+                        <th>Observación</th>
+                        <th>Situación</th>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td>Carga Procesal < Carga Procesal Minima Anual</td>
+                          <td>Meta Preliminar = 77% de la Carga Procesal Anual (*)</td>
+                          <td><button type="button" class="btn rounded-pill btn-success">SUBCARGA</button></td>
+                        </tr>
+
+                        <tr>
+                          <td>Carga Procesal Mínima Anual <= Carga procesal Anual <= Carga Procesal Máxima Anual</td>
+                          <td>Meta Preliminar = Estandar de Producción</td>
+                          <td><button type="button" class="btn rounded-pill btn-warning">ESTANDAR</button></td>
+                        </tr>
+
+                        <tr>
+                          <td>Carga Procesal Anual > Carga Procesal Máxima Anual</td>
+                          <td>Meta Preliminar = Estandar de Producción</td>
+                          <td><button type="button" class="btn rounded-pill btn-danger">SOBRECARGA</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+</section>
+{% endblock  %}
+
+{% block datatable %}
+{% endblock  %}
+
+{% block script %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const avanceMeta = parseFloat('{{ avance_meta|floatformat:2 }}'.replace(',', '.'));
+    const idealMeta = parseFloat('{{ ideal_meta|floatformat:2 }}'.replace(',', '.'));
+    const color = avanceMeta >= idealMeta ? '#28a745' : '#dc3545';
+
+    var options = {
+        series: [avanceMeta],
+        chart: {
+            height: 350,
+            type: 'radialBar'
+        }, 
+        plotOptions: {
+            radialBar: {
+                startAngle: -90,
+                endAngle: 90,
+                hollow: {
+                    size: '65%'
+                },
+                dataLabels: {
+                  show: false, // Ocultar etiquetas predeterminadas
+                  value: {
+                    color: color, // Aplicar el color dinámico
+                    fontSize: '24px',
+                    offsetY: -10
+                  }
+                },
+                track: {
+                  background: '#f0f0f0',
+                  strokeWidth: '100%',
+              }
+
+            }
+        },
+        fill: {
+          colors: [color] // Cambiar el color de relleno dinámicamente
+      },
+        labels: ['Avance de Meta']
+    };
+
+    var chart = new ApexCharts(document.querySelector("#grafico-media-luna"), options);
+    chart.render();
+});
+</script>
+{% endblock %}

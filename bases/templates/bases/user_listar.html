@@ -1,0 +1,367 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} SARA :: Usuarios {% endblock %} </title>
+
+{% block body_container %}
+
+{% comment %} ==========================================
+    MODAL PARA ELIMINAR AL JUEZ
+========================================== {% endcomment %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este Usuario?</p>
+                <form method="POST" id="deleteForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="delete_id" name="delete_id">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} ==========================================
+    MODAL PARA AGREGAR
+========================================== {% endcomment %}
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Activar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas <span class="font-weight-bold">ACTIVAR</span> este Usuario?</p>
+                <form method="POST" id="addForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="add_id" name="add_id">
+                    <button type="submit" class="btn btn-success">Activar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignModalLabel">Asignar Módulos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pr-2">
+                <div id="modalContent">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mt-2">
+                <div class="col-lg-6 mb-2">
+                    <div class="card">
+                        <div class="d-flex align-items-end row">
+                            <div class="col-7">
+                                <div class="card-body text-nowrap">
+                                    <h2 class="card-title mb-0 font-weight-bold">Listar Usuarios</h2>
+                                    <p class="mb-2">Sistema de Estadistica / Listar Usuarios</p>
+                                    <a href="{% url "bases:user_new" %}"><button class="btn btn-success"><i class="fas fa-plus"></i> Agregar Usuario</button></a>
+                                </div>
+                            </div>
+
+                            <div class="col-5 text-center text-sm-left">
+                                <div class="card-body pb-0 px-0 px-md-4">
+                                <img
+                                    src="{% static "base/img/inicio.jpg" %}"
+                                    height="140"
+                                    alt="view sales"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 mb-2 col-xl-3">
+                    <div class="card h-100">
+                      <div class="card-body pt-5 mb-0 pb-0 text-center">
+                        <img width="50" src="{% static "base/img/Icon/femenino.png" %}">
+                        <h5 class="mb-0 mt-3">Usuarios Femeninos</h5>
+                        <h3 class="font-weight-bold card-title mb-0">{{ count_femenino }}</h3>
+                      </div>
+                    </div>
+                  </div>
+
+                <div class="col-sm-6 mb-2 col-xl-3">
+                    <div class="card h-100">
+                    <div class="card-body pt-5 mb-0 pb-0 text-center">
+                        <img width="50" src="{% static "base/img/Icon/masculino.png" %}">
+                        <h5 class="mb-0 mt-3">Usuarios Masculinos</h5>
+                        <h3 class="font-weight-bold card-title mb-0">{{ count_masculino }}</h3>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            {% comment %} ==========================================
+            TABAL DE USUARIOS
+            ======================================= {% endcomment %}
+            <div class="card mt-3">
+                <div class="card-datatable table-responsive">
+                    <table class="datatables-users table" id="tableUsuario">
+                        <thead class="border-top bg-dark">
+                        <tr>
+                            <th class="text-center text-white" style="font-size:14px">ID</th>
+                            <th class="text-center text-white" style="font-size:14px">APELLIDOS Y NOMBRES</th>
+                            <th class="text-center text-white" style="font-size:14px">USUARIO</th>
+                            <th class="text-center text-white" style="font-size:14px">IMAGEN</th>
+                            <th class="text-center text-white" style="font-size:14px">ESTADO</th>
+                            <th class="text-center text-white" style="font-size:14px">OPCIONES</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in obj %}
+                            <tr>
+                                <td class="text-center">{{ item.id }}</td>
+                                <td class="text-uppercase">{{ item.x_app_paterno }} {{ item.x_app_materno }} {{ item.x_nombres }}</td>
+                                <td class="text-uppercase text-center">{{ item.username }}</td>
+                                <td class="text-center">
+                                    {% if item.profile_image %}
+                                    <img src="{{ item.profile_image.url }}" alt="Imagen de perfil" style="width: 50px; height: 50px; border-radius: 50%;">
+                                    {% else %}
+                                    <img src="{{ item.profile_image.perfil.png }}" alt="Imagen de perfil por defecto" style="width: 50px; height: 50px; border-radius: 50%;">
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if item.is_active %}
+                                    <span class="text-success"><i class="fa-solid fa-circle-check"></i> ACTIVO </span>
+                                    {% else %}
+                                    <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> INACTIVO</span>
+                                    {% endif %}
+                                </td> 
+                                <td class="text-center">    
+
+                                    <div class="btn-group">       
+                                        {% if item.is_active %}       
+                                            <a href="{% url 'bases:user_edit' item.pk %}" class="btn btn-info">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'bases:user_pass_edit' item.pk %}" class="btn btn-dark">
+                                                <i class="fa-solid fa-key"></i>
+                                            </a>
+
+                                            <button 
+                                                class="btn btn-primary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#assignModal" 
+                                                data-url="{% url 'bases:user_asignar_modulos' item.id %}"
+                                                data-id="{{ item.id }}">
+                                                <i class="fas fa-layer-group"></i>
+                                            </button>
+
+                                            <button 
+                                                class="btn btn-danger" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteModal" 
+                                                data-id="{{ item.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+
+                                            <a href="{% url 'bases:generar_credenciales_pdf' item.id %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        {% else %}
+                                        <button 
+                                            class="btn btn-success" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#addModal" 
+                                            data-id="{{ item.id }}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block datatable %}
+<script>
+    $(document).ready(function () {
+        $('#tableUsuario').DataTable({
+            "pageLength": 25,
+            "lengthMenu": [[25, 40, 50, 100, -1], [25, 40, 50, 100, "Todos"]],
+            autoWidth: false,
+            responsive: true,
+            dom: '<"row mb-3"<"col-md-3"l><"col-md-6 text-center"B><"col-md-3"f>>t<"row"<"col-md-6"i><"col-md-6"p>>',
+            buttons: [
+                {
+                    extend: 'collection',
+                    text: '<i class="fa fa-download"></i> Exportar Tabla',
+                    className: 'btn btn-danger mt-6',
+                    buttons: [
+                        { extend: 'print', text: '<i class="fa fa-print"></i> Imprimir' },
+                        { extend: 'csv', text: '<i class="fa fa-file-csv"></i> Archivo CSV' },
+                        { extend: 'excel', text: '<i class="fa fa-file-excel"></i> Archivo Excel' },
+                        { extend: 'pdf', text: '<i class="fa fa-file-pdf"></i> Archivo PDF' },
+                        { extend: 'copy', text: '<i class="fa fa-copy"></i> Copiar' }
+                    ]
+                }
+            ],
+            language: {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sSearch": "Buscar:",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            },
+        });
+    });
+</script>
+{% endblock  %}
+
+{% block script %}
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    const csrftoken = getCookie("csrftoken");
+    
+    $.ajaxSetup({
+        headers: {
+            "X-CSRFToken": csrftoken,
+        },
+    });    
+
+    $("#deleteModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data("id");
+        $("#delete_id").val(id);
+    });
+    
+    $("#deleteForm").submit(function (e) {
+        e.preventDefault();
+        const id = $("#delete_id").val();
+        $.ajax({
+            url: `../../usuario/delete/${id}/`,
+            method: "POST",
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
+        });
+    });
+
+    $("#addModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data("id");
+        $("#add_id").val(id);
+    });
+    
+    $("#addForm").submit(function (e) {
+        e.preventDefault();
+        const id = $("#add_id").val();
+        $.ajax({
+            url: `../../usuario/activar/${id}/`,
+            method: "POST",
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
+        });
+    });
+
+    $('#assignModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const userId = button.data('id');
+        const modal = $(this);
+
+        $.ajax({
+            url: `/user/${userId}/AsignarModulos/`,
+            method: 'GET',
+            success: function (data) {
+                modal.find('#modalContent').html(data.html);
+            }
+        });
+    });
+
+    // Enviar datos del formulario
+    $(document).on('submit', '#assignModulesForm', function (e) {
+        e.preventDefault();
+        const form = $(this);
+        const url = form.attr('action');
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: form.serialize(), // Serializa los datos del formulario
+            success: function(response) {
+                console.log(response);  // Esto mostrará la respuesta del servidor
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    $('#assignModal').modal('hide');
+                }
+            },
+            error: function(xhr) {
+                // Muestra un mensaje de error con SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un problema al asignar los módulos. Inténtalo nuevamente.',
+                    confirmButtonText: 'OK'
+                });
+                console.error('Error:', xhr.responseText);
+            }
+        });
+    });
+</script>
+{% endblock %}

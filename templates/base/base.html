@@ -1,0 +1,418 @@
+{% load static %}
+
+<!doctype html>
+
+<html
+  lang="en"
+  class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
+  dir="ltr"
+  data-theme="theme-dark"
+  data-assets-path="../../assets/"
+  data-template="vertical-menu-template-no-customizer"
+  data-style="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+      <title>{% block title %}  {% endblock %} </title>
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static "base/img/Icon/grafico.png" %}  " />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
+      rel="stylesheet" />
+      
+
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="{% static 'base/vendor/sweetalert2/sweetalert2.css'%}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/fonts/fontawesome.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'base/vendor/fonts/tabler-icons.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/fonts/flag-icons.css' %}" />
+
+    <!-- Core -->
+    <link rel="stylesheet" href="{% static 'base/css/core.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'base/css/theme-default.css' %}" type="text/css">
+
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+
+    <link rel="stylesheet" href="{% static 'base/vendor/perfect-scrollbar/perfect-scrollbar.css'%}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/swiper/swiper.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/stepper/stepper.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/bootstrap-select/bootstrap-select.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/select2/select2.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/form-validation/form-validation.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/css/cards-advance.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/apex-charts/apex-charts.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static "base/js/helpers.js" %}"></script>
+    <script src=" {% static "base/js/config.js" %}"></script>
+    
+  </head>
+
+  <body>
+    {% block login %}{% endblock %}
+
+    {% block wrapper %}
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+
+
+        {% comment %} MENU PRINCIPAL {% endcomment %}
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+          <div class="app-brand demo">
+            <a href="{% url "bases:home" %}" class="app-brand-link mt-2">
+              <span class="app-brand-logo demo">
+                <img src="{% static 'base/img/logopj.png' %}" alt="CSJSANTA" class="img-fluid" width="40">
+              </span>
+              <span class="app-brand-text demo menu-text fw-bold">Corte Superior <br> de Justicia del Santa</span>
+            </a>
+
+            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+              <i class="ti menu-toggle-icon d-none d-xl-block align-middle"></i>
+              <i class="ti ti-x d-block d-xl-none ti-md align-middle"></i>
+            </a>
+          </div>
+
+          {% comment %}? ======== USUARIO ============ {% endcomment %}
+          <ul class="menu-inner py-1">
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <img src="{{ user.profile_image.url }}" alt="Imagen de perfil" class="menu-icon">
+                <div>{{user.x_nombres}} {{user.x_app_paterno}}</div>
+              </a>
+  
+              {% if not perms.est.list_mae_est_organo_jurisdiccionales %}
+              <ul class="menu-sub">  
+                <li class="menu-item">
+                  <a href="{% url "bases:cambiar_password" %}" class="menu-link">
+                    <div>Cambiar Clave</div>
+                  </a>
+                </li>
+              </ul>
+              {% endif %}
+            </li>
+
+            {% comment %} =========================================================
+            =========== VISUALIZACIÓN PARA PRESIDENCIA Y GERENCIA =================
+            ====================================================== {% endcomment %}
+            {% if perms.est.list_mae_est_modulos or perms.est.list_mov_est_modulo_usuarios %}
+              <li class="menu-header small">
+                <span class="menu-header-text">Tablero de Control</span>
+              </li>
+            {% endif %}
+
+            {% if perms.est.list_mae_est_modulos or perms.est.list_mov_est_modulo_usuarios %}
+              <li class="menu-item">
+                <a href="{% url "est:estadistica_menu" %}" class="menu-link">
+                  <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <div>Estadística</div>
+                </a>
+              </li>
+            {% endif %}
+
+            {% if perms.est.list_mae_est_modulos %}
+              <li class="menu-item">
+                <a href="{% url "est:logistica_menu" %}" class="menu-link">
+                  <img src="{% static "base/img/Icon/logistica_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <div>Logística</div>
+                </a>
+              </li>
+
+              <li class="menu-item">
+                <a href="{% url "est:presupuesto_menu" %}" class="menu-link">
+                  <img src="{% static "base/img/Icon/presupuesto_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <div>Presupuesto</div>
+                </a>
+              </li>
+
+              <li class="menu-item">
+                <a href="{% url "est:depositos_menu" %}" class="menu-link">
+                  <img src="{% static "base/img/Icon/deposito_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <div>Depósitos</div>
+                </a>
+              </li>
+
+              <li class="menu-item">
+                <a href="{% url "est:camaras_menu" %}" class="menu-link">
+                  <img src="{% static "base/img/Icon/camara_black.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <div>Cámaras</div>
+                </a>
+              </li>
+
+              <li class="menu-item">
+                <a href="" class="menu-link">
+                  <img src="{% static "base/img/Icon/notificacion_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <div>Notificación</div>
+                </a>
+              </li>
+            {% endif %}
+
+            {% comment %}=======================================
+            Seccion de Configuración de Estadistica
+            =================================== {% endcomment %}
+            {% if perms.est.view_mae_est_escalas %}
+            
+            <li class="menu-header small">
+              <span class="menu-header-text">Estadistica</span>
+            </li>
+
+            {% comment %} ESTADISTICA {% endcomment %}
+            <li class="menu-item">
+              <a href="{% url "est:estadistica_menu" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Estadística</div>
+              </a>
+            </li>
+
+            {% comment %} ESCALA {% endcomment %}
+            <li class="menu-item">
+              <a href="{% url "est:escala_list" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/escala_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Escalas</div>
+              </a>
+            </li>
+
+            {% comment %} ESTANDAR DE PRODUCCION {% endcomment %}
+            <li class="menu-item">
+              <a href="{% url "est:estandar_prod_list" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/productividad_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Estandar de Produccion</div>
+              </a>
+            </li>
+            
+            {% endif %}
+
+            {% comment %} =========================================================
+            =========================== CONFIGURACIÓN =============================
+            ====================================================== {% endcomment %}
+            {% if perms.bases.view_usuario %}
+            <li class="menu-header small">
+              <span class="menu-header-text">Configuración</span>
+            </li>
+
+            {% comment %} USUARIOS {% endcomment %}
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <img src="{% static 'base/img/Icon/usuarios_gris.png' %}" alt="usuarios" class="menu-icon">
+                <div>Usuarios</div>
+              </a>
+
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="{% url "bases:user_list" %}" class="menu-link">
+                    <div data-i18n="List">Usuarios</div>
+                  </a>
+                </li>
+
+                <li class="menu-item">
+                  <a href="{% url "bases:group_list" %}" class="menu-link">
+                    <div data-i18n="List">Grupos</div>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            {% endif %}
+
+            {% comment %} INSTANCIA {% endcomment %}
+            {% if perms.est.view_mae_est_instancia %}
+            <li class="menu-item">
+              <a href="{% url "est:instancia_list" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/instancia_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Instancias</div>
+              </a>
+            </li>
+            {% endif %}
+
+            {% comment %} JUECES {% endcomment %}
+            {% if perms.est.view_mae_est_jueces %}
+            <li class="menu-item">
+              <a href="{% url "est:jueces_list" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/jueces_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Jueces</div>
+              </a>
+            </li>
+            {% endif %}
+
+            {% comment %} JUEZ - INSTANCIA {% endcomment %}
+            {% if perms.est.view_mov_est_instancia_jueces %}
+            <li class="menu-item">
+              <a href="{% url "est:juez_instancia_list" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/juez.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Asignar Instancia</div>
+              </a>
+            </li>
+            {% endif %}
+
+            {% comment %} MODULOS {% endcomment %}
+            {% if perms.est.view_mae_est_modulos %}
+            <li class="menu-item">
+              <a href="{% url "est:modulo_list" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/modulo_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Módulos</div>
+              </a>
+            </li>
+            {% endif %}
+
+            {% comment %}=======================================
+            Seccion de Juez de Productividad
+            =================================== {% endcomment %}
+            {% if perms.est.list_mae_est_jueces %}
+            <li class="menu-header small">
+              <span class="menu-header-text">Productividad</span>
+            </li>
+
+            {% comment %} Nivel de Producción {% endcomment %}
+            <li class="menu-item">
+              <a href="{% url "est:nivel_productividad" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Nivel de Produccion</div>
+              </a>
+            </li>
+            {% endif %}
+
+            {% if perms.est.list_mae_est_jueces or perms.est.list_mae_est_organo_jurisdiccionales %}
+            <li class="menu-item">
+              <a href="{% url "est:power_estadistica" %}" class="menu-link">
+                <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <div>Dashboard Estadístico</div>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+
+        </aside>
+
+
+       
+        <div class="layout-page">
+          {% block nav %}{% endblock %}
+
+          <div class="content-wrapper">
+           
+            {% comment %} CUERPO DEL CONTENIDO {% endcomment %}
+           {% block body_container %}{% endblock %}
+
+            <!-- Footer -->
+            <footer class="footer bg-light">
+              <div
+                class="container-fluid d-flex flex-md-row flex-column justify-content-between align-items-md-center gap-1 container-p-x py-4">
+                <div>
+                  <a
+                    href=""
+                    class="footer-text fw-medium"
+                    >Corte Superior de Justicia del Santa</a
+                  >
+                  ©
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-4">
+                  <a href="{% url "bases:logout" %}" class="btn btn-sm btn-outline-danger"
+                    ><i class="ti ti-logout me-1"></i>Cerrar Sesión</a
+                  >
+                </div>
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
+
+      <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+      <div class="drag-target"></div>
+    </div>
+    {% endblock %}
+   
+
+
+    <!-- Cargar tus scripts personalizados -->
+    
+    <script src="{% static 'base/js/jquery.js' %}"></script>
+    <script src="{% static 'base/js/bootstrap.js' %}"></script>
+
+    <script src="{% static 'base/vendor/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'base/js/menu.js' %}"></script>
+
+    <script src="{% static 'base/vendor/apex-charts/apexcharts.js' %}"></script>
+    <script src="{% static 'base/vendor/swiper/swiper.js' %}"></script>
+    <script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
+
+    <script src="{% static 'base/vendor/stepper/stepper.js' %}"></script>
+    <script src="{% static 'base/vendor/bootstrap-select/bootstrap-select.js' %}"></script>
+    <script src="{% static 'base/vendor/select2/select2.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/popular.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/bootstrap5.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/auto-focus.js' %}"></script>
+    
+    <script src="{% static 'base/vendor/sweetalert2/sweetalert2.js' %}"></script>
+    <script src="{% static 'base/js/main.js' %}"></script>
+    <script src="{% static 'base/vendor/stepper/form-wizard-numbered.js' %}"></script>
+    <!-- endbuild -->
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
+    <script src="{% static 'base/js/dashboards-analytics.js' %}"></script>
+    <script src="{% static 'base/js/charts-chartjs.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    {% block datatable %}
+    <script>
+        $(document).ready(function(){
+            $('.table').DataTable({
+                "pageLength": 25, // Muestra 25 filas por página al cargar
+                "lengthMenu": [ [25,40, 50, 100, -1], [25,40, 50, 100, "Todos"] ],
+                autoWidth: false,
+                responsive: true,
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
+    </script>
+{% endblock  %}
+
+{% block script %}
+{% endblock %}
+
+
+  </body>
+</html>

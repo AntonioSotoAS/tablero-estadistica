@@ -1,0 +1,155 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} Presidencia :: Panel de Control {% endblock %} </title>
+{% block wrapper %}
+<style>
+body {
+    background-color:rgb(180,180,180) ;
+    background-size: cover;
+    color: white;
+  }
+
+  .icon-menu {
+    padding: 10px 0;
+  }
+
+  .icon-item {
+    text-align: center;
+  }
+
+  .icon-circle {
+    width: 250px;
+    height: 250px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .icon-circle i {
+    font-size: 100px;
+  }
+
+  .icon-text {
+    margin-top: 10px;
+    font-size: 30px;
+    font-family: Helvetica;
+  }
+
+  .chart-container {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 30px;
+    border-radius: 10px;
+    margin-top: 50px;
+  }
+
+  .chart {
+    width: 100%;
+    height: 300px;
+    background-color: #222;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .image-grow {
+    transition: transform 0.3s ease;
+    }
+
+    .image-grow:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light ">
+        <div class="container">
+            <a href="{% url "bases:presidencia" %}">
+                <img src="{% static "base/img/csjsanta.png" %}" class="img-fluid" width="250">
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 pb-0">
+                <h1 class="text-center font-weight-bold text-dark" >TABLERO DE CONTROL</h1>
+            </div>
+        </div>
+        
+
+
+      <div class="row mt-3">
+        <div class="col-lg-4 col-sm-6 mb-3">
+          <a href="{% url "bases:estadistica_menu" %}">
+            <div class="card card-border-shadow-dark h-100">
+              <div class="card-body p-4">
+                <img src="{% static "base/img/Icon/grafico_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                  <h5 class="mb-0 text-center">Estadística</h5>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-lg-4 col-sm-6 mb-3">
+          <div class="card card-border-shadow-dark h-100">
+            <div class="card-body p-4">
+              <img src="{% static "base/Img/Icon/logistica_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                <h5 class="mb-0 text-center">Logística</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-6 mb-3">
+          <div class="card card-border-shadow-dark h-100">
+            <div class="card-body p-4">
+              <img src="{% static "base/img/Icon/presupuesto_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                <h5 class="mb-0 text-center">Presupuesto</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-6 mb-3">
+          <div class="card card-border-shadow-dark h-100">
+            <div class="card-body p-4">
+              <img src="{% static "base/img/Icon/deposito_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+              <h5 class="mb-0 text-center">Depósitos</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-6 mb-3">
+          <a href="">
+            <div class="card card-border-shadow-dark h-100">
+              <div class="card-body p-4">
+                <img src="{% static "base/img/Icon/camara_black.png" %}" class="img-fluid w-25 mx-auto d-block">
+                  <h5 class="mb-0 text-center">Cámaras</h5>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-lg-4 col-sm-6 mb-3">
+          <a href="{% url "est:power_sinoe" %}">
+            <div class="card card-border-shadow-dark h-100">
+              <div class="card-body p-4">
+                <img src="{% static "base/img/Icon/notificacion_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                  <h5 class="mb-0 text-center">Sinoe</h5>
+              </div>
+            </div>
+          </a>
+        </div>
+
+
+      </div>
+
+
+  
+    {% endblock %}

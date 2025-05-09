@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+INICIO :: CORTE DEL SANTA
+{% endblock  %}
+
+{% block body_container %}
+<section class="content">
+      {% if perms.est.list_mae_est_modulos %}
+      {% comment%} =============================================
+      PRESIDENTE - PANEL DE CONTROL
+      ========================================== {% endcomment %}
+      <div class="container-xxl flex-grow-1 container-p-y mt-5 d-flex justify-content-center align-items-center">
+ 
+            <div class="card p-5">
+                <h1 class="mb-2 mx-2 text-center font-weight-bold">🚧 Página en Mantenimiento! 🚧</h1>
+                <div class="mt-2">
+                    <img src="{% static "base/img/images/mantenimiento.svg" %}" alt="pagina_mantenimiento" class="w-75 img-fluid mx-auto d-flex" />
+                </div>
+            </div>
+
+      </div>
+      {% endif %}
+</section>
+{% endblock  %}
+
+{% block datatable %}
+{% endblock  %}

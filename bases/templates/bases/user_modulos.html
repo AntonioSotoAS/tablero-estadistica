@@ -1,0 +1,30 @@
+<form method="POST" action="{% url 'bases:user_asignar_modulos' user.id %}" id="assignModulesForm">
+    {% csrf_token %}
+    <div class="modal-body p-0">
+        <div class="form-group">
+            <p class="text-muted">Selecciona los módulos que deseas asignar al usuario:</p>
+            <div class="row row-cols-2 g-2">
+                {% for modulo in modulos %}
+                <div class="col">
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input" 
+                            type="checkbox" 
+                            name="modulos" 
+                            id="modulo{{ modulo.n_id_modulo }}" 
+                            value="{{ modulo.n_id_modulo }}"
+                            {% if modulo.n_id_modulo in assigned_modulos %}checked{% endif %}>
+                        <label class="form-check-label" for="modulo{{ modulo.n_id_modulo }}">
+                            {{ modulo.x_nombre }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+</form>
