@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 from bases import views
 from django.views.generic import TemplateView
 #VISTAS
-from bases.views import Home, UserView, GroupView,UserPasswordChangeView,Presidencia,preestadistica_modulos,preestadistica_menu,\
+from bases.views import Home, UserView, GroupView,UserPasswordChangeView,\
                         UserNew, user_group_admin, custom_logout_view, group_delete, group_permiso, group_user, UserPassEdit, \
                         UserDeleteView, UserActivarView, UserAssignModulesView
 
@@ -21,10 +21,6 @@ urlpatterns = [
     path('user/<int:pk>/AsignarModulos/', UserAssignModulesView.as_view(), name='user_asignar_modulos'),
     path('usuarios/<int:user_id>/credenciales/', views.generar_credenciales_pdf, name='generar_credenciales_pdf'),
 
-    path('Presidencia/',views.Presidencia,name='presidencia'),
-    path('Presidencia/estadistica/', views.preestadistica_menu, name='estadistica_menu'),
-    path('Presidencia/estadistica/modulos', views.preestadistica_modulos, name='estadistica_modulos'),
-    path('Presidencia/estadistica/modulos/<int:modulo_id>/Grafica/', views.preestadistica_modulos_grafica, name="estadistica_modulo_grafica"),
     path('Presidencia/estadistica/OrganoJurisdiccional/datos/', views.obtener_datos_instancia, name='obtener_datos_instancia'),
     path('Presidencia/estadistica/OrganoJurisdiccional/', views.Estadistica_por_organo, name="estadistica_organo"),
 

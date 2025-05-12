@@ -128,7 +128,6 @@ class Home(LoginRequiredMixin, generic.TemplateView):
 
         return context
 
-
 def custom_logout_view(request):
     logout(request)
     return redirect ('bases:login')
@@ -136,71 +135,6 @@ def custom_logout_view(request):
 #!========================================================
 #!===================== USUARIOS =========================
 #!========================================================
-def Presidencia(request):
-    return render(request,"bases/presidencia.html")
-
-def preestadistica_menu(request):
-    modulos = mae_est_modulos.objects.filter(l_activo = 'S')
-    return render(request, "bases/pre_estadistica_menu.html", {'dato': modulos})
-
-def preestadistica_modulos(request):
-    modulos = mae_est_modulos.objects.filter(l_activo = 'S')
-    return render(request, "bases/pre_estadistica_modulos.html", {'dato': modulos})
-
-def preestadistica_modulos_grafica(request, modulo_id):
-    locale.setlocale(locale.LC_TIME, "es_PE.UTF-8")
-    modulo = get_object_or_404(mae_est_modulos, pk=modulo_id)
-
-    yesterday = datetime.now() - timedelta(days=1)
-    year = yesterday.year
-    previous_month = yesterday.month
-
-    previous_month_name = month_name[previous_month]
-    current_month_name = month_name[datetime.now().month]
-
-    # Obtener los datos de las instancias con el campo de jurisdicción
-    resumenes = mae_est_meta_resumenes.objects.filter(
-        n_id_modulo=modulo,
-        n_anio_est=year,
-        n_mes_est=previous_month
-    ).values(
-        'n_instancia__x_corto',
-        'n_instancia__x_nom_instancia',
-        'n_instancia__c_org_jurisd__x_nom_org_jurisd',  # Nombre del órgano jurisdiccional
-        'x_situacion_carga',
-        'x_niv_produc',
-        'm_avan_meta',
-        'm_ideal_avan_meta',
-        'm_meta_preliminar',
-        'n_carg_procesal_ini',
-        'f_fecha_mod',
-
-    ).annotate(
-        total_ingreso=Sum('m_t_ingreso'),
-        total_resuelto=Sum('m_t_resuelto')
-    ).order_by('n_instancia__c_org_jurisd', '-m_avan_meta')
-
-    # Agrupar por órgano jurisdiccional
-    agrupados = defaultdict(list)
-    for resumen in resumenes:
-        # Convierte los valores Decimal a string
-        resumen['m_avan_meta'] = float(resumen['m_avan_meta']) if resumen['m_avan_meta'] is not None else 0
-        resumen['m_ideal_avan_meta'] = float(resumen['m_ideal_avan_meta']) if resumen['m_ideal_avan_meta'] is not None else 0
-        resumen['f_fecha_mod'] = resumen['f_fecha_mod'].strftime('%d/%m/%Y a las %H:%M') \
-        if resumen['f_fecha_mod'] else 'Sin fecha'
-
-        agrupados[resumen['n_instancia__c_org_jurisd__x_nom_org_jurisd']].append(resumen)
-
-    context = {
-        "modulo": modulo,
-        "agrupados": dict(agrupados),  # Convertir defaultdict a diccionario normal
-        "mes_anterior": previous_month_name,
-        "mes_actual": current_month_name,
-        "anio_actual": year,
-    }
-    
-    return render(request, 'bases/pre_estadistica_modulos_grafica.html', context)
-
 #? ========================================================
 #? Para Organos Jurisdiccionales
 def Estadistica_por_organo(request):

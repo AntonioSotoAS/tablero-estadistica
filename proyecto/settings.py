@@ -65,28 +65,28 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 #HOSTING
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': 'zodgiwxd_estadisticacsjsanta',
-#        'USER': 'zodgiwxd_userestadistica',
-#        'PASSWORD':'Infor@123456',
-#        'HOST':'75.102.57.41',
-#        'PORT':3306
-#    }
-#}
-
-#SERVIDOR
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'csjsanta_indicadores',
-        'USER': 'root',
-        'PASSWORD':'Pj123456*',
-        'HOST':'localhost',
+        'NAME': 'zodgiwxd_estadisticacsjsanta',
+        'USER': 'zodgiwxd_userestadistica',
+        'PASSWORD':'Infor@123456',
+        'HOST':'75.102.57.41',
         'PORT':3306
     }
 }
+
+#SERVIDOR
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'csjsanta_indicadores',
+#        'USER': 'root',
+#        'PASSWORD':'Pj123456*',
+#        'HOST':'localhost',
+#        'PORT':3306
+#    }
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
