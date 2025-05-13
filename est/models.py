@@ -294,6 +294,7 @@ class mae_est_meta_resumenes(models.Model):
     n_carg_procesal_ini = models.IntegerField()
     m_t_resuelto = models.IntegerField()
     m_t_ingreso = models.IntegerField()
+    m_t_ingreso_proy = models.IntegerField()
     m_ing_proyectado = models.IntegerField()
     m_carg_procesal_tram = models.IntegerField()
     m_carg_procesal_min = models.IntegerField()
