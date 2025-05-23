@@ -35,16 +35,17 @@ INICIO :: CORTE DEL SANTA
                 href=""
                 data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
-                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
+                <img src="{{ user.profile_image.url }}" alt class="rounded-circle" />
                 </div>
             </a>
+
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
                 <a class="dropdown-item mt-0" >
                     <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 me-2">
                         <div class="avatar avatar-online">
-                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
+                        <img src="{{ user.profile_image.url }}" alt="" class="rounded-circle" />
                         </div>
                     </div>
                     <div class="flex-grow-1">
@@ -110,47 +111,216 @@ INICIO :: CORTE DEL SANTA
     <div class="container-xxl flex-grow-1 container-p-y">
 
       <div class="row mt-3"> 
-        <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-9 order-0 ">
-          <div class="row">
-            {% comment%} CARD DE BIENVENIDA {% endcomment %}
-            <div class="col-xl-12">
-              <div class="card">
-                <div class="card-body">
-                  <div class="d-flex align-items-end row">
-                    <div class="col-12 col-sm-12 col-md-2 col-lg-5 col-xl-4 col-xxl-4 d-flex align-items-center">
-                        <img src="{{ user.profile_image.url }}" alt="Imagen de perfil" class="img-circle img-fluid mx-auto d-block d-flex align-items-center w-50">
-                    </div>
+      {% comment %} PERFIL DE USUARIO INGRESADO ----- COLUMNA 4 {% endcomment %}
+      <div class="col-12 col-xl-4 col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
 
-                    <div class="col-12 col-sm-12 col-md-10 col-lg-7 col-xl-8 col-xxl-8">
-                        <h4 class="card-title text-dark font-weight-bold">Bienvenido <br>{{user.x_nombres}} {{user.x_app_paterno}} {{user.x_app_materno}}!</h4>
-                        
-                        <p class="mb-4" style="text-align: justify;">
-                          {% if perms.est.list_mae_est_modulos %}
-                          Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control, que le permitirá monitorear el estado general de las operaciones. Hacer seguimiento detallado a las actividades de las Juzgados, y a las oficinas de Logística y Presupuesto, para asegurar un control eficiente y oportuno.
-                          {% elif perms.est.list_mae_est_jueces %}
-                          El Sistema estadistico, el cual analiza con las herramientas disponibles para obtener información de los indicadores y el nivel de productividad de los juzgados.
-                          {% elif perms.est.list_mae_est_organo_jurisdiccionales %}
-                          Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control. Podrá consultar las actividades de los Juzgados para asegurar un control eficiente y oportuno.
-                          {% else %}
-                          Bievenido al Sistema Estadistico
-                          {% endif %}
-                        </p>
-                    </div>
+              <img class="img-fluid rounded-circle mx-auto d-block" src="{{ user.profile_image.url }}" alt="Card girl image" width="160" />
+
+            <h5 class="mb-2 text-center">{{user.x_nombres}} {{user.x_app_paterno}} {{user.x_app_materno}}!</h5>
+            <p class="text-justify">
+              {% if perms.est.list_mae_est_modulos %}
+              Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control, que le permitirá monitorear el estado general de las operaciones. Hacer seguimiento detallado a las actividades de las Juzgados, y a las oficinas de Logística y Presupuesto, para asegurar un control eficiente y oportuno.
+              {% elif perms.est.list_mae_est_jueces %}
+              El Sistema estadistico, el cual analiza con las herramientas disponibles para obtener información de los indicadores y el nivel de productividad de los juzgados.
+              {% elif perms.est.list_mae_est_organo_jurisdiccionales %}
+              Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control. Podrá consultar las actividades de los Juzgados para asegurar un control eficiente y oportuno.
+              {% else %}
+              Bievenido al Sistema Estadistico
+              {% endif %}
+            </p>
+            <div class="row mb-4 g-3">
+              <div class="col-12">
+                <div class="d-flex align-items-center">
+                  <div class="avatar flex-shrink-0 me-3">
+                    <img src="{% static "base/img/Icon/reloj_n.png" %}">
+                  </div>
+                  <div>
+                    <h6 class="mb-0 text-nowrap">Ultima Actualización de Datos</h6>
+                    <small>{{ f_fecha_mod }}</small>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-3">
-          <div class="card mb-2">
-            <div class="card-header align-items-center text-center pb-1">
-              <img src="{% static "base/img/Icon/reloj_n.png" %}" class="img-fluid w-25 mb-2 mx-auto d-block">
-              <span class="text-center badge bg-danger bg-glow mt-2 mb-2">Última Actualización de Datos</span>
-              <h4>{{ f_fecha_mod }}</h4>
+      {% comment %} INFORMACIÓN DE LA CALIFICACIÓN {% endcomment %}
+      <div class="col-xxl-5 col-lg-5 mb-3">
+        <div class="card h-100">
+          <div class="card-header pb-0 mb-0 d-flex justify-content-between">
+            <div class="card-title mb-0">
+              <h5 class="pb-0 mb-0">Detalles de Semáforos Estadisticos</h5>
             </div>
           </div>
+          <div class="card-body p-0">
+            <div class="nav-align-top">
+              <ul class="nav nav-tabs nav-fill rounded-0 timeline-indicator-advanced" role="tablist">
+                <li class="nav-item">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-new" aria-controls="navs-justified-new" aria-selected="true">Nivel Productividad</button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-link-preparing" aria-controls="navs-justified-link-preparing" aria-selected="false">IER</button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-link-shipping" aria-controls="navs-justified-link-shipping" aria-selected="false">Situacion de Carga</button>
+                </li>
+              </ul>
+
+              <div class="tab-content border-0  mx-1">
+                <div class="tab-pane fade show active" id="navs-justified-new" role="tabpanel">
+                  <ul class="timeline mb-0">
+                    <li class="timeline-item ps-6 ">
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-success bg-glow">MUY BUENO</span>
+                        </div>
+                        <h6 class="my-50">Si el nivel de productividad esta entre 88 a más</h6>
+                        <h6 class="my-50">Avance Real es igual o superior al Avance Anual.</h6>
+                      </div>
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-warning bg-glow">BUENO</span>
+                        </div>
+                        <h6 class="my-50">Si el nivel de productividad esta entre 75 y 87</h6>
+                        <h6 class="my-50">Avance Real es igual o superior al Avance Ideal del mes anterior e inferior al Avance Ideal.</h6>
+                      </div>
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-danger bg-glow">BAJO</span>
+                        </div>
+                        <h6 class="my-50">Si el nivel de productividad esta entre 0 y 74 Bajo</h6>
+                        <h6 class="my-50">Avance Real es inferior al avance ideal del mes anterior.</h6>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="tab-pane fade" id="navs-justified-link-preparing" role="tabpanel">
+                  <ul class="timeline mb-0">
+                    <li class="timeline-item ps-6 ">
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-success bg-glow">%</span>
+                        </div>
+                        <h6 class="my-50"><span class="font-weight-bold"> CRITERIO: </span> IER >= 90% </h6>
+                        <h6 class="my-50"><span class="font-weight-bold">INTERPRETACION: </span>La producción es al menos el 90% del volumen de expedientes ingresados a tramite.</h6>
+                      </div>
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-warning bg-glow">%</span>
+                        </div>
+                          <h6 class="my-50"><span class="font-weight-bold">CRITERIO: </span> 50% <= IER <= 90% </h6>
+                          <h6 class="my-50"><span class="font-weight-bold">INTERPRETACION: </span>El ingreso de expedientes a trámite es mayor a la producción pero no llega a ser el doble.</h6>
+                      </div>
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-danger bg-glow">%</span>
+                        </div>
+                          <h6 class="my-50"><span class="font-weight-bold">CRITERIO: </span>50% < 50% </h6>
+                          <h6 class="my-50"><span class="font-weight-bold">INTERPRETACION: </span> Se produce menos de la mitad de los expedientes que ingresan a trámite.</h6>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="tab-pane fade" id="navs-justified-link-shipping" role="tabpanel">
+                  <ul class="timeline mb-0">
+                    <li class="timeline-item ps-6 ">
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-success bg-glow">SUBCARGA</span>
+                        </div>
+                        <h6 class="my-50">Carga Procesal < Carga Procesal Minima Anual</h6>
+                        <h6 class="my-50">Meta Preliminar = 77% de la Carga Procesal Anual (*)</h6>
+                      </div>
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-warning bg-glow">ESTANDAR</span>
+                        </div>
+                        <h6 class="my-50">Carga Procesal Mínima Anual <= Carga procesal Anual <= Carga Procesal Máxima Anual</h6>
+                        <h6 class="my-50">Meta Preliminar = Estandar de Producción</h6>
+                      </div>
+
+                      <div class="timeline-event pt-0">
+                        <div class="timeline-header">
+                          <span class="badge bg-danger bg-glow">SOBRECARGA </span>
+                        </div>
+                        <h6 class="my-50">Carga Procesal Anual > Carga Procesal Máxima Anual</h6>
+                        <h6 class="my-50">Meta Preliminar = Estandar de Producción</h6>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} INFORMACIÓN SEGÚN PERFIL {% endcomment %}
+      <div class="col-12 col-xl-3 col-md-6 mb-3">
+        <div class="row">
+          {% if perms.est.list_mae_est_modulos %}
+          <div class="col-lg-12 mb-3">
+            <div class="card card-border-shadow-dark h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-1">
+                  <div class="avatar me-4">
+                    <span class="avatar-initial rounded bg-label-dark"><i class="fas fa-building"></i></span>
+                  </div>
+                  <h4 class="mb-0">{{cantidad_instancias}}</h4>
+                </div>
+                <p class="mb-1">Instancias y/o Juzgados</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-12 mb-3">
+            <div class="card card-border-shadow-dark h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-1">
+                  <div class="avatar me-4">
+                    <span class="avatar-initial rounded bg-label-dark"><i class="fas fa-gavel"></i></span>
+                  </div>
+                  <h4 class="mb-0">{{cantidad_jueces_activos}}</h4>
+                </div>
+                <p class="mb-1">Jueces Activos</p>
+              </div>
+            </div>
+          </div>
+          {% elif perms.est.list_mov_est_modulo_usuarios %}
+          <div class="col-lg-12 col-sm-6 mb-3">
+            <a href="{% url "est:estadistica_menu" %}">
+              <div class="card card-border-shadow-dark h-100">
+                <div class="card-body p-4">
+                  <img src="{% static "base/img/Icon/grafico_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Estadística</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-lg-12 col-sm-6 mb-3">
+            <a href="{% url "est:power_estadistica" %}">
+                <div class="card card-border-shadow-dark h-100">
+                    <div class="card-body p-4">
+                        <img src="{% static "base/img/Icon/dashboard_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                        <h5 class="mb-0 text-center">Dashbord Estadistica</h5>
+                    </div>
+                </div>
+            </a>
+          </div>
+          {% endif %}
         </div>
       </div>
 

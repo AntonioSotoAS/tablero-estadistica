@@ -1,0 +1,180 @@
+{% extends "base/base.html" %}
+{% load static %}
+<title>{% block title %} SARA :: Usuarios {% endblock %} </title>
+
+{% block nav %}
+<nav style="padding: 40px 10px; height: 70px;"
+    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+    id="layout-navbar">
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+        <i class="ti ti-menu-2 ti-md"></i>
+        </a>
+    </div>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center ">
+        <div class="nav-item navbar-search-wrapper mb-0">
+            <img
+            src="{% static "base/img/Icon/grafico_n.png" %}"
+            alt="user image"
+            class=" rounded p-3" width="75" height="70" />
+            
+        </div>
+        <h2 class="d-none d-md-inline-block font-weight-bold pt-4"></h2>
+        </div>
+
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a
+                class="nav-link dropdown-toggle hide-arrow p-0"
+                href=""
+                data-bs-toggle="dropdown">
+                <div class="avatar avatar-online">
+                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                <a class="dropdown-item mt-0" >
+                    <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-2">
+                        <div class="avatar avatar-online">
+                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
+                    </div>
+                    </div>
+                </a>
+                </li>
+                <li>
+                <div class="dropdown-divider my-1 mx-n2"></div>
+                </li>
+                <li>
+                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
+                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
+                </a>
+                </li>
+                <li>
+                <div class="d-grid px-2 pt-2 pb-1">
+                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
+                    <small class="align-middle">Cerrar Sesión</small>
+                    <i class="ti ti-logout ms-2 ti-14px"></i>
+                    </a>
+                </div>
+                </li>
+            </ul>
+        </li>
+        </ul>
+    </div>
+
+</nav>
+{% endblock  %}
+
+{% block body_container %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            {% comment %} ==========================================
+            TABAL DE USUARIOS
+            ======================================= {% endcomment %}
+            <div class="row">
+                <div class="col-8">
+                    <div class="card mt-3">
+                        <div class="card-datatable table-responsive">
+                            <table class="datatables-users table" id="tableListarUsuarios">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Usuario</th>
+                                        <th>Fecha y Hora</th>
+                                        <th>IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for acceso in accesos %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td class="text-uppercase">{{ acceso.usuario.x_nombres }} {{ acceso.usuario.x_app_paterno }} {{ acceso.usuario.x_app_materno }}</td>
+                                            <td>{{ acceso.f_fecha_hora|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ acceso.x_ip }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="3">No hay registros de acceso.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="card mt-3">
+                        <div class="card-datatable table-responsive">
+                            <table class="datatables-users table" id="">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Usuario</th>
+                                        <th>Ingresos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ingreso in ingresos %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ ingreso.usuario__x_nombres }} {{ ingreso.usuario__x_app_paterno }}</td>
+                                        <td>{{ ingreso.total_ingresos }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block datatable %}
+<script>
+    $(document).ready(function () {
+        $('#tableListarUsuarios').DataTable({
+            "pageLength": 25,
+            "lengthMenu": [[25, 40, 50, 100, -1], [25, 40, 50, 100, "Todos"]],
+            autoWidth: false,
+            responsive: true,
+            "order": [[2, "desc"]],
+            language: {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sSearch": "Buscar:",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            },
+        });
+    });
+</script>
+{% endblock  %}

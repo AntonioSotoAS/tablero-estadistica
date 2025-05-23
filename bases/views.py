@@ -17,6 +17,7 @@ from django.db.models import Sum
 from datetime import datetime, timedelta     
 from collections import defaultdict
 import locale
+from django.db.models import Count
 from calendar import month_name
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
@@ -26,30 +27,37 @@ from django.template.loader import get_template
 #? ================== MODELOS ====================
 from django.contrib.auth.models import User, Group, Permission
 from django.utils.timezone import now, timedelta
-from bases.models import usuario, mae_est_sexos
+from bases.models import usuario, mae_est_sexos, hst_usuario_accesos
 from est.models import mov_est_instancia_usuarios, mae_est_modulos, mae_est_meta_resumenes, mae_est_instancia, mae_est_organo_jurisdiccionales, mae_est_jueces, mov_est_instancia_jueces, mov_est_modulo_usuarios
 
 #? ===============================================
 #? =============== FORMULARIOS ===================
 from .forms import UsuarioForm, PasswordChangeForm, UsuarioPassForm, UsuarioEditForm
 
-
 class Home(LoginRequiredMixin, generic.TemplateView):
     template_name = "bases/home.html"
     login_url = '/login'
 
+    #Sobrescribe el método para agregar datos al contexto que será pasado a la plantilla.
     def get_context_data(self, **kwargs):
+        #Llama al método de la clase base para inicializar el contexto.
         context = super().get_context_data(**kwargs)
-        user = self.request.user  # Obtener el usuario actual
-        juez = mae_est_jueces.objects.filter(usuario=user, l_activo='S').first()  # Verificar si el usuario es un juez activo
+        # Obtener el usuario actual
+        user = self.request.user  
+        # Contar los jueces con l_estado = 'S'
+        context['cantidad_jueces_activos'] = mae_est_jueces.objects.filter(l_activo='S').count()
+        context['cantidad_instancias'] = mae_est_instancia.objects.filter(l_ind_baja='N').count()
+        #Filtra el modelo para verificar si el usuario está registrado como un juez activo.
+        juez = mae_est_jueces.objects.filter(usuario=user, l_activo='S').first()
 
+        #Comprueba si el usuario es un juez activo.
         if juez:
             # Obtener las instancias asignadas al juez
             instancias_asignadas = mov_est_instancia_jueces.objects.filter(
                 n_id_juez=juez, l_activo='S'
             ).select_related('n_instancia')
 
-            # Agregar las instancias al contexto
+            # Agrega las instancias asignadas al contexto, estructurándolas en una lista de diccionarios.
             context['instancias_asignadas'] = [
                 {
                     'id': instancia.n_instancia.n_instancia_id,
@@ -58,18 +66,18 @@ class Home(LoginRequiredMixin, generic.TemplateView):
                 for instancia in instancias_asignadas
             ]
 
-            # Obtener el día anterior a la fecha actual
+            # Calcula la fecha actual y el día anterior.
             fecha_actual = now()
             fecha_ayer = fecha_actual - timedelta(days=1)
 
-            # Filtrar los datos de mae_est_meta_resumenes
+            # Filtra los registros de mae_est_meta_resumenes correspondientes a las instancias del juez y al mes/año del día anterior.
             resumenes = mae_est_meta_resumenes.objects.filter(
                 n_instancia__in=[instancia.n_instancia for instancia in instancias_asignadas],
                 n_anio_est=fecha_ayer.year,
                 n_mes_est=fecha_ayer.month
             ).select_related('n_instancia')
 
-            # Agregar los resumenes al contexto
+            # Estructura los datos de los resúmenes en una lista de diccionarios para el contexto.
             context['resumenes'] = [
                 {
                     'id': resumen.n_id_meta_resumen,
@@ -87,19 +95,24 @@ class Home(LoginRequiredMixin, generic.TemplateView):
                 }
                 for resumen in resumenes
             ]
+
+            #Calcula el avance de la meta y el ideal de la meta con valores predeterminados si no hay resúmenes.
             context['avance_meta'] = resumenes.first().m_avan_meta if resumenes else 0
             context['ideal_meta'] = resumenes.first().m_ideal_avan_meta if resumenes else 0
+        
+        #Asigna valores vacíos o predeterminados al contexto si el usuario no es juez activo.
         else:
             context['instancias_asignadas'] = []
             context['resumenes'] = []
-            context['avance_meta'] = 0  # Valor predeterminado si no hay resumenes.
+            context['avance_meta'] = 0 
             
+        #Captura la fecha y hora actuales.
+        fecha_hora_actual = now()
 
-        fecha_hora_actual = now()  # Usar `now()` asegura que está ajustado a la configuración TIME_ZONE de Django
-
-        # Recuperar un registro específico de mae_est_meta_resumenes
+        # Recupera un registro específico de mae_est_meta_resumenes, formatea su fecha de modificación, y maneja casos en los que no exista.
+        #! (Debido a que la tabla de resumenes se resetea todo y se pone una misma fecha para todo, se elige el id 1)
         try:
-            meta_resumen = mae_est_meta_resumenes.objects.get(n_id_meta_resumen=1)  # Cambia el ID según tus necesidades
+            meta_resumen = mae_est_meta_resumenes.objects.get(n_id_meta_resumen=1)  
             f_fecha_mod = meta_resumen.f_fecha_mod
 
             if f_fecha_mod:
@@ -121,11 +134,11 @@ class Home(LoginRequiredMixin, generic.TemplateView):
         except mae_est_meta_resumenes.DoesNotExist:
             f_fecha_mod = "Fecha no disponible"
 
-        # Agregar las instancias asignadas al contexto
+        # Agrega la fecha y hora actuales, así como la fecha de modificación, al contexto.
         context['fecha_hora_actual'] = fecha_hora_actual
         context['f_fecha_mod'] = f_fecha_mod  # Agregar la fecha de modificación al contexto
-        
 
+        # Devuelve el contexto completo para que se use en la plantilla.
         return context
 
 def custom_logout_view(request):
@@ -540,7 +553,6 @@ def generar_credenciales_pdf(request, user_id):
         return HttpResponse("Ocurrió un error al generar el PDF", content_type='text/plain')
     return response
 
-
 #!========================================================
 #!================ CAMBIAR CONTRASEÑA ====================
 #!========================================================
@@ -639,3 +651,21 @@ def group_permiso(request,id_grp,id_perm):
         else:
             return JsonResponse({"status": "error", "title": "Acción no reconocida"}, status=400)
     return Http404("Método No Reconocido")
+
+
+#! =======================================================
+
+#! =======================================================
+def listar_accesos(request):
+    # Consulta para listar accesos
+    accesos = hst_usuario_accesos.objects.select_related('usuario').all().order_by('-f_fecha_hora')
+
+    # Consulta para contar ingresos por usuario
+    ingresos = (
+        hst_usuario_accesos.objects.values('usuario__x_nombres', 'usuario__x_app_paterno')
+        .annotate(total_ingresos=Count('id'))
+        .order_by('-total_ingresos')  # Ordenar de mayor a menor número de ingresos
+    )
+
+    # Renderizar ambos contextos en la misma plantilla
+    return render(request, 'bases/listar_accesos.html', {'accesos': accesos, 'ingresos': ingresos})

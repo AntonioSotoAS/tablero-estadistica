@@ -8,7 +8,8 @@ from django.views.generic import TemplateView
 #VISTAS
 from bases.views import Home, UserView, GroupView,UserPasswordChangeView,\
                         UserNew, user_group_admin, custom_logout_view, group_delete, group_permiso, group_user, UserPassEdit, \
-                        UserDeleteView, UserActivarView, UserAssignModulesView
+                        UserDeleteView, UserActivarView, UserAssignModulesView,\
+                        listar_accesos
 
 
 urlpatterns = [
@@ -49,4 +50,6 @@ urlpatterns = [
     path('cambiar-password/', UserPasswordChangeView.as_view(), name='cambiar_password'),
     # Puedes añadir una URL adicional para mostrar el mensaje de éxito:
     path('cambiar-password/hecho/', TemplateView.as_view(template_name='bases/password_change_done.html'), name='password_change_done'),   
+
+    path('accesos/', listar_accesos, name='listar_accesos'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

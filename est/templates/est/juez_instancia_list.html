@@ -2,6 +2,79 @@
 {% load static %}
 <title>{% block title %} Asignar Instancia :: Estadistica {% endblock %} </title>
 
+{% block nav %}
+<nav style="padding: 40px 10px; height: 70px;"
+    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+    id="layout-navbar">
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+        <i class="ti ti-menu-2 ti-md"></i>
+        </a>
+    </div>
+
+    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center ">
+        <div class="nav-item navbar-search-wrapper mb-0">
+            <img
+            src="{% static "base/img/Icon/grafico_n.png" %}"
+            alt="user image"
+            class=" rounded p-3" width="75" height="70" />
+            
+        </div>
+        <h2 class="d-none d-md-inline-block font-weight-bold pt-4"></h2>
+        </div>
+
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a
+                class="nav-link dropdown-toggle hide-arrow p-0"
+                href=""
+                data-bs-toggle="dropdown">
+                <div class="avatar avatar-online">
+                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                <a class="dropdown-item mt-0" >
+                    <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-2">
+                        <div class="avatar avatar-online">
+                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
+                    </div>
+                    </div>
+                </a>
+                </li>
+                <li>
+                <div class="dropdown-divider my-1 mx-n2"></div>
+                </li>
+                <li>
+                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
+                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
+                </a>
+                </li>
+                <li>
+                <div class="d-grid px-2 pt-2 pb-1">
+                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
+                    <small class="align-middle">Cerrar Sesión</small>
+                    <i class="ti ti-logout ms-2 ti-14px"></i>
+                    </a>
+                </div>
+                </li>
+            </ul>
+        </li>
+        </ul>
+    </div>
+
+</nav>
+{% endblock  %}
+
+
 {% block body_container %}
 
 {% comment %} ==========================================
@@ -51,6 +124,28 @@
 
                     </div>
                     <button type="submit" class="btn btn-dark">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} ==========================================
+    MODAL PARA ELIMINAR AL JUEZ
+========================================== {% endcomment %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar Asginación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar esta asignación?</p>
+                <form method="POST" id="deleteForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="delete_id" name="delete_id">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
                 </form>
             </div>
         </div>
@@ -135,8 +230,9 @@
                         <thead class="border-top bg-dark">
                         <tr>
                             <th class="text-center text-white" style="font-size:14px">#</th>
-                            <th class="text-center text-white" style="font-size:14px">Organo Juridiccional</th>
                             <th class="text-center text-white" style="font-size:14px">NOMBRE DE JUEZ</th>
+                            <th class="text-center text-white" style="font-size:14px">Organo Juridiccional</th>
+                            <th class="text-center text-white" style="font-size:14px">ESTADO</th>
                             <th class="text-center text-white" style="font-size:14px">RESOLUCIÓN</th>
                             <th class="text-center text-white" style="font-size:14px">OPCIONES</th>
                         </tr>
@@ -145,15 +241,21 @@
                         <tbody>
                             {% for asignacion in datos %}
                                 <tr>
-                                    <td>{{forloop.counter}}</td>
-                                    <td>{{ asignacion.n_instancia.x_nom_instancia }}</td>
-                                    <td>
+                                    <td style="font-size:14px">{{forloop.counter}}</td>
+                                    <td style="font-size:14px">
                                         {{ asignacion.n_id_juez.usuario.x_app_paterno|upper }}
                                         {{ asignacion.n_id_juez.usuario.x_app_materno|upper }}
                                         {{ asignacion.n_id_juez.usuario.x_nombres|upper }}
                                     </td>
-
-                                    <td>{{ asignacion.x_resolucion }}</td>
+                                    <td style="font-size:14px">{{ asignacion.n_instancia.x_nom_instancia }}</td>
+                                    <td class="text-center">
+                                        {% if asignacion.l_activo == "S" %}
+                                            <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="font-size:14px">{{ asignacion.x_resolucion }}</td>
                                     <td>
                                     <div class="btn-group">
                                         {% if asignacion.x_pdf_res %}
@@ -161,8 +263,13 @@
                                         {% else %}
                                             No disponible
                                         {% endif %}
-                                        <button href="#" class="btn btn-primary"><i class="fas fa-edit"></i></button>
-                                        <button href="#" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+
+                                        <button class="btn btn-danger" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteModal" 
+                                                data-id="{{ asignacion.n_id_instancia_juez }}">
+                                                <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                     </td>
                                 </tr>
@@ -275,6 +382,27 @@
             error: function(xhr) {
                 alert('Error en el servidor.');
             }
+        });
+    });
+
+    // Eliminar módulo
+    $("#deleteModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data("id");
+        $("#delete_id").val(id);
+    });
+    
+    $("#deleteForm").submit(function (e) {
+        e.preventDefault();
+        const id = $("#delete_id").val();
+        $.ajax({
+            url: `../../est/JuezInstancia/Eliminar/${id}/`,
+            method: "POST",
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
         });
     });
 </script>

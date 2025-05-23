@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from est import views
 from est.views import JuecesListView , JuecesCreateView, JuecesDeleteView, JuecesEditarView, JuecesActivarView,\
-                    JuecesInstanciaListView, JuecesInstanciaCreateView, \
+                    JuecesInstanciaListView, JuecesInstanciaCreateView, JuecesInstanciaDeleteView, \
                     NivelProductividad,\
                     ModuloListView, ModuloCreateView, ModuloUpdateView, ModuloDeleteView, \
                     EscalaListView, ListarEstProdView, InstanciasListView,\
@@ -23,6 +23,7 @@ urlpatterns = [
     #? ================== JUECES INSTANCIAS ====================
     path('JuezInstancia/', JuecesInstanciaListView.as_view(), name='juez_instancia_list'),
     path('JuezInstancia/Crear/', JuecesInstanciaCreateView.as_view(), name='juez_instancia_crear'),
+    path('JuezInstancia/Eliminar/<int:pk>/', JuecesInstanciaDeleteView.as_view(), name='juez_instancia_eliminar'),
 
     #? =========================================================
     #? =======================INSTANCIAS =======================

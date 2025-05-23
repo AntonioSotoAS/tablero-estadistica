@@ -76,6 +76,18 @@ DATABASES = {
     }
 }
 
+#LOCAL
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'csjsanta_indicadores',
+#        'USER': 'root',
+#        'PASSWORD':'Pj123456*',
+#        'HOST':'localhost',
+#        'PORT':3306
+#    }
+#}
+
 #SERVIDOR
 #DATABASES = {
 #    'default': {
@@ -114,8 +126,6 @@ LANGUAGE_CODE = 'es-pe'
 TIME_ZONE = 'America/Lima'
 USE_I18N = True
 USE_TZ = True
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

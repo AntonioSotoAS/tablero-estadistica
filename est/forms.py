@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.timezone import localtime, now
 from .models import  mae_est_modulos, mae_est_jueces, mae_est_usuarios_groups, mov_est_estprod_anuales,mae_est_escala_detalle,\
                     mov_est_instancia_jueces
 
@@ -49,6 +50,13 @@ class AsignacionJuezForm(forms.ModelForm):
     class Meta:
         model = mov_est_instancia_jueces
         fields = ['n_instancia', 'n_id_juez', 'x_resolucion', 'x_pdf_res']
+
+    def save(self, commit=True):
+        instancia = super().save(commit=False)
+        instancia.f_fecha_creacion = localtime(now())
+        if commit:
+            instancia.save()
+        return instancia
 
 #! =============================================
 #! ============== ESCALA DETALLE ===============

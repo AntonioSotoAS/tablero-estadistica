@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.timezone import localtime
+from django.utils.timezone import now
 from django.contrib.auth.models import AbstractUser, Group
 
 class mae_est_sexos(models.Model):
@@ -48,3 +50,15 @@ class mae_est_usuarios_groups(models.Model):
     class Meta:
         db_table = 'mae_est_usuarios_groups'
 
+
+class hst_usuario_accesos(models.Model):
+    usuario = models.ForeignKey(usuario, on_delete=models.CASCADE, related_name='login_records')
+    f_fecha_hora = models.DateTimeField(auto_now_add=True)
+    x_ip = models.GenericIPAddressField()
+    
+    def __str__(self):
+        local_timestamp = localtime(self.f_fecha_hora)                                                             # Convertir a la zona horaria local
+        return f"{self.usuario.x_app_paterno} - {local_timestamp} - {self.x_ip}"
+    
+    class Meta:
+        db_table = 'hst_usuario_accesos'

@@ -128,7 +128,7 @@ INICIO :: CORTE DEL SANTA
                                 <div class="col-lg-12 col-12">
                                 {% for jurisdiccion, instancias in agrupados.items %}
                                     <h3 class="text-center mt-5 mb-0 font-weight-bold">RANKING DE {{ jurisdiccion }}</h3>
-                                    <div class="text-center mt-0 mb-3"><span class="font-weight-bold">Información:</span> De 01 de Enero 2025 hasta {{ fecha_modificacion }}</div>
+                                    <div class="text-center mt-0 mb-3"><span class="font-weight-bold">Información:</span> Desde 01 de Enero hasta <span class="font-weight-bold">{{ fecha_modificacion }}</span></div>
                                     <canvas  id="graficoBarras_{{ forloop.counter }}"></canvas>
 
                                     <script id="data_{{ forloop.counter }}" type="application/json">
@@ -139,6 +139,7 @@ INICIO :: CORTE DEL SANTA
                                         const labels_{{ forloop.counter }} = {{ instancias|safe }}.map(i => i.n_instancia__x_nom_instancia);
                                         const x_corto_{{ forloop.counter }} = {{ instancias|safe }}.map(i => i.n_instancia__x_corto); // Extraer x_corto
                                         const nombre_instancia_{{ forloop.counter }} = {{ instancias|safe }}.map(i => i.n_instancia__x_nom_instancia);
+                                        const nombres_juez_{{ forloop.counter }} = {{ instancias|safe }}.map(i => i.juez_nombre); // Extraer nombres de los jueces
                                         const avance_{{ forloop.counter }} = {{ instancias|safe }}.map(i => parseFloat(i.m_avan_meta));
                                         const ideal_avance_{{ forloop.counter }} = {{ instancias|safe }}.map(i => parseFloat(i.m_ideal_avan_meta));
                                 
@@ -201,10 +202,12 @@ INICIO :: CORTE DEL SANTA
                                                             label: function(tooltipItem) {
                                                                 let index = tooltipItem.dataIndex;
                                                                 let corto = x_corto_{{ forloop.counter }}[index];
+                                                                const nombre_juez = nombres_juez_{{ forloop.counter }}[index]; // Agregar nombre del juez
                                                                 let avanceReal = avance_{{ forloop.counter }}[index];
                                                                 let ideal = ideal_avance_{{ forloop.counter }}[index];
                                                                 let nombre_instancia = nombre_instancia_{{ forloop.counter }}[index];
                                                                 return [
+                                                                `👨‍⚖️ Juez: ${nombre_juez}`,
                                                                 `🏢 ${nombre_instancia}`,    
                                                                 `〽️ Avance Real: ${avanceReal}%`,
                                                                 `📊 Meta Ideal: ${ideal}%`
@@ -269,7 +272,7 @@ INICIO :: CORTE DEL SANTA
                                         {% for org_jurisd, resumenes in agrupados.items %}
                                         <div class="col-12 mt-3">
                                             <h4 class="text-center mb-0 font-weight-bold">{{ org_jurisd }}</h4>
-                                            <div class="text-center mt-0 mb-3"><span class="font-weight-bold">Información:</span> De 01 de Enero 2025 hasta {{ fecha_modificacion }}</div>
+                                            <div class="text-center mt-0 mb-3"><span class="font-weight-bold">Información:</span> Desde 01 de Enero hasta <span class="font-weight-bold">{{ fecha_modificacion }}</span></div>
                                         </div>
                                         {% for resumen in resumenes %}
                                             <div class="col-lg-6 col-12">
@@ -364,7 +367,7 @@ INICIO :: CORTE DEL SANTA
                                 <div class="col-lg-12 col-12">
                                     {% for jurisdiccion, instancias in agrupados.items %}
                                     <h3 class="text-center font-weight-bold mb-0">{{ jurisdiccion }}</h3>
-                                    <div class="text-center mt-0 mb-3"><span class="font-weight-bold">Información:</span> De 01 de Enero 2025 hasta {{ fecha_modificacion }}</div>
+                                    <div class="text-center mt-0 mb-3"><span class="font-weight-bold">Información:</span> Desde 01 de Enero hasta <span class="font-weight-bold">{{ fecha_modificacion }}</span></div>
                                     <canvas id="graficaHorizontal_{{ forloop.counter0 }}"></canvas>
                                     <script id="data_{{ forloop.counter0 }}" type="application/json">
                                         {{ instancias|safe }}

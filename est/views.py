@@ -8,14 +8,16 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from datetime import datetime, timedelta                                                      
 from django.db.models import Sum
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 from datetime import timedelta
 from collections import defaultdict
 from calendar import month_name
 from decimal import Decimal
-from django.utils.timezone import localtime
+from django.db.models import OuterRef, Subquery, Q, Value, CharField
+from django.db.models.functions import Concat
 from django.contrib.auth.decorators import login_required
 import locale
+from django.utils import timezone
 
 from .forms import ModuloForm, AsignacionJuezForm, EstProdAnualForm, JuezForm
 from bases.models import usuario
@@ -114,6 +116,14 @@ class JuecesInstanciaCreateView(View):
             form.save()
             return JsonResponse({'success': True, 'message': 'Juez asignado correctamente.'})
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    
+class JuecesInstanciaDeleteView(View):
+    def post(self, request, pk):
+        instancia_juez = get_object_or_404(mov_est_instancia_jueces, pk=pk)
+        instancia_juez.l_activo = 'N'
+        instancia_juez.f_fecha_baja = localtime(now())
+        instancia_juez.save()
+        return JsonResponse({'success': True})
 
 #!========================================================
 #!===================== MODULOS ==========================
@@ -151,6 +161,7 @@ class ModuloDeleteView(View):
 #!========================================================
 #!================ MODULOS - INSTANCIAS===================
 #!========================================================
+@login_required
 def InstanciaModulosListView(request, modulo_id):
     # Obtén el módulo seleccionado
     modulo = get_object_or_404(mae_est_modulos, n_id_modulo=modulo_id)
@@ -186,6 +197,7 @@ class EscalaListView(CreateView):
         escalas = mae_est_escalas.objects.all()
         return render(request, 'est/escala_list.html', {'escalas': escalas})
 
+@login_required
 def agregar_detalle_escala(request, escala_id):
     escala = get_object_or_404(mae_est_escalas, n_id_escala=escala_id)
     meses = {
@@ -208,6 +220,7 @@ def agregar_detalle_escala(request, escala_id):
 
     return render (request, 'est/escala_detalle_list.html', {'detalle': detalle_con_meses})
 
+@login_required
 def listar_escala(request):
     escala = mae_est_escalas.objects.all()
     return render(request, 'est/escala_list.html', {'dato': escala})
@@ -254,11 +267,13 @@ class EstProdAnualCreateView(View):
 #!========================================================
 #!================== ESTADISTICA =========================
 #!========================================================   
+@login_required
 def Estadistica(request):
     return render(request,"est/estadistica_menu.html")
 
 #* El usuario con sesión activa podrá visualizar los módulos al que fue asignado
 #* el permiso que tiene es ---- perm.mov.est_modulo_usuarios
+@login_required
 def Estadistica_por_modulo(request):
     # Obtener el usuario activo (autenticado)
     usuario_actual = request.user
@@ -272,24 +287,58 @@ def Estadistica_por_modulo(request):
     # Renderizar la plantilla con los módulos asignados
     return render(request, "est/estadistica_modulos.html", {'dato': modulos_asignados})
 
+#!========================================================
+#!====== ESTADISTICA POR MODULO MOSTRANDO GRAFICO ========
+#!========================================================   
+@login_required
 def Estadistica_modulo_grafica(request, modulo_id):
+    # Configura el idioma local para formatear nombres de meses en español
     try:
+        # Cambia a tu configuración regional
         locale.setlocale(locale.LC_ALL, 'es_PE.UTF-8')  # Cambia a tu configuración regional
     except locale.Error as e:
+        # Captura cualquier error al configurar el locale y lo imprime
         print(f"Error al configurar el locale: {e}")
+    # Obtiene el módulo correspondiente al `modulo_id` o lanza un error 404 si no existe
     modulo = get_object_or_404(mae_est_modulos, pk=modulo_id)
 
+    # Calcula la fecha del día anterior y extrae el año y el mes correspondiente
     yesterday = datetime.now() - timedelta(days=1)
     year = yesterday.year
     previous_month = yesterday.month
 
+    # Obtiene los nombres del mes actual y del mes anterior usando `month_name`
     previous_month_name = month_name[previous_month]
     current_month_name = month_name[datetime.now().month]
 
-    # Obtener los datos de las instancias con el campo de jurisdicción
+    # Subquery para obtener el nombre completo concatenado del juez activo asignado a una instancia
+    juez_subquery = mov_est_instancia_jueces.objects.filter(
+        n_instancia=OuterRef('n_instancia__pk'),
+        l_activo='S'
+    ).order_by('-f_fecha_creacion').values(
+        'n_id_juez__usuario__x_nombres'
+    )[:1]
+
+    # Si quieres concatenar nombre + apellido paterno + materno:
+    juez_fullname_subquery = mov_est_instancia_jueces.objects.filter(
+        n_instancia=OuterRef('n_instancia__pk'),
+        l_activo='S'
+    ).order_by('-f_fecha_creacion').annotate(
+        fullname=Concat(
+            'n_id_juez__usuario__x_nombres', Value(' '),
+            'n_id_juez__usuario__x_app_paterno', Value(' '),
+            'n_id_juez__usuario__x_app_materno',
+            output_field=CharField()
+        )
+    ).values('fullname')[:1]
+
+    # Consulta los datos de las instancias relacionadas con el módulo y agrega cálculos
     resumenes = mae_est_meta_resumenes.objects.filter(
-        n_id_modulo=modulo,
+        # Filtra por el módulo actual
+        n_id_modulo=modulo,        
+        # Filtra por el año calculado             
         n_anio_est=year,
+        # Filtra por el mes anterior
         n_mes_est=previous_month
     ).values(
         'n_instancia__x_corto',
@@ -302,31 +351,51 @@ def Estadistica_modulo_grafica(request, modulo_id):
         'm_ideal_avan_meta',
         'm_meta_preliminar',
         'n_carg_procesal_ini',
-
     ).annotate(
+        # Calcula los totales de ingresos y resueltos
         total_ingreso=Sum('m_t_ingreso'),
-        total_resuelto=Sum('m_t_resuelto')
+        total_resuelto=Sum('m_t_resuelto'),
+
+        # Agregamos info del juez con Subquery: concatenamos nombre completo
+        juez_nombre=Subquery(juez_fullname_subquery)
     ).order_by('n_instancia__c_org_jurisd', '-m_avan_meta')
 
-    # Obtener la fecha de modificación del registro específico
+    # Intenta obtener la fecha de modificación de un registro específico
     try:
         fecha_modificacion = mae_est_meta_resumenes.objects.get(n_id_meta_resumen=1).f_fecha_mod
-        # Formatear la fecha para mostrarla
-        fecha_modificacion_formateada = localtime(fecha_modificacion).strftime('%d/%m/%Y a las %H:%M')
+        # Diccionario para convertir el número del mes al nombre del mes en español
+        meses = {
+            1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
+            5: "mayo", 6: "junio", 7: "julio", 8: "agosto",
+            9: "septiembre", 10: "octubre", 11: "noviembre", 12: "diciembre"
+        }
+
+        # Formatea la fecha al estilo "día de mes de año"
+        fecha_modificacion_formateada = (
+            f"{fecha_modificacion.day} de {meses[fecha_modificacion.month]} de {fecha_modificacion.year} a las {fecha_modificacion.strftime('%H:%M')} hrs."
+        )
     except mae_est_meta_resumenes.DoesNotExist:
+        # Si el registro no existe, establece una fecha predeterminada
         fecha_modificacion_formateada = "Sin fecha"
 
-    # Agrupar por órgano jurisdiccional
+    # Agrupa los datos por el nombre del órgano jurisdiccional
     agrupados = defaultdict(list)
     for resumen in resumenes:
-        # Convierte los valores Decimal a string
+        # Convierte valores decimales a flotantes para evitar problemas de representación
         resumen['m_avan_meta'] = float(resumen['m_avan_meta']) if resumen['m_avan_meta'] is not None else 0
         resumen['m_ideal_avan_meta'] = float(resumen['m_ideal_avan_meta']) if resumen['m_ideal_avan_meta'] is not None else 0
-        resumen['f_fecha_mod'] = resumen['f_fecha_mod'].strftime('%d/%m/%Y a las %H:%M') \
-        if resumen['f_fecha_mod'] else 'Sin fecha'
 
+        # Formatea la fecha de modificación si está disponible
+        resumen['f_fecha_mod'] = resumen['f_fecha_mod'].strftime('%d/%m/%Y a las %H:%M') \
+            if resumen['f_fecha_mod'] else 'Sin fecha'
+        
+        # Si no hay juez asignado, ponemos un valor por defecto
+        resumen['juez_nombre'] = resumen.get('juez_nombre') or 'Sin juez asignado'
+
+        # Agrega el resumen al grupo correspondiente por órgano jurisdiccional
         agrupados[resumen['n_instancia__c_org_jurisd__x_nom_org_jurisd']].append(resumen)
 
+    # Prepara el contexto para pasar los datos al template
     context = {
         "modulo": modulo,
         "agrupados": dict(agrupados),  # Convertir defaultdict a diccionario normal
@@ -336,11 +405,13 @@ def Estadistica_modulo_grafica(request, modulo_id):
         "fecha_modificacion": fecha_modificacion_formateada,  # Agregar la fecha al contexto
     }
     
+    # Renderiza el template con el contexto preparado
     return render(request, 'est/estadistica_modulos_grafica.html', context)
 
 #! =======================================================
 #! ================= CONSULTAR POR ORGANO ================
 #! ======================================================= 
+@login_required
 def Estadistica_por_organo(request):
     # Obtener el usuario activo (autenticado)
     usuario_actual = request.user
@@ -363,6 +434,7 @@ def Estadistica_por_organo(request):
     # Renderizar la plantilla con las instancias filtradas
     return render(request, 'est/estadistica_organo.html', context)
 
+@login_required
 def obtener_datos_instancia(request):
     if request.method == "GET" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         instancia_id = request.GET.get("instancia_id")
@@ -413,6 +485,7 @@ def obtener_datos_instancia(request):
 #! =======================================================
 #! ======= COMPARAR INSTANCIAS COMO SI FUESE UN VS =======
 #! ======================================================= 
+@login_required
 def comparar_instancias(request):
     organos = mae_est_organo_jurisdiccionales.objects.filter(l_activo='S')
     resumen1 = resumen2 = None
@@ -436,6 +509,7 @@ def comparar_instancias(request):
         'instancia_2': instancia_2,
     })
 
+@login_required
 def get_instancias_por_organo(request):
     org_id = request.GET.get('org_id')
     instancias = mae_est_instancia.objects.filter(c_org_jurisd__c_org_jurisd=org_id, l_ind_baja='N')
@@ -445,6 +519,7 @@ def get_instancias_por_organo(request):
 #! =======================================================
 #! =========== VISTA DE JUEZ =================
 #! ======================================================= 
+@login_required
 def NivelProductividad(request):
     template_name = "est/nivel_productividad.html"
     user = request.user  # Obtener el usuario actual
@@ -551,9 +626,11 @@ def NivelProductividad(request):
 #! =======================================================
 #! ==================== POWER BI =========================
 #! ======================================================= 
+@login_required
 def PowerSinoe(request):
     return render(request,"est/powerbi_sinoe.html")  
 
+@login_required
 def PowerJornada(request):
     return render(request,"est/powerbi_jornada.html")  
 
@@ -561,20 +638,25 @@ def PowerJornada(request):
 def PowerEstadistica(request):
     return render(request,"est/powerbi_estadistica.html")  
 
+@login_required
 def PowerNepena(request):
     return render(request,"est/powerbi_nepena.html")
 
 #? =========================================================
 #? ====================== LOGISTICA ========================
 #? =========================================================
+@login_required
 def Logistica_menu(request):
     return render(request,"est/logistica_menu.html")
 
+@login_required
 def Presupuesto_menu(request):
     return render(request,"est/presupuesto_menu.html")
 
+@login_required
 def Depositos_menu(request):
     return render(request,"est/deposito_menu.html")
 
+@login_required
 def Camaras_menu(request):
     return render(request,"est/camaras_menu.html")
