@@ -14,3 +14,4 @@ def log_login(sender, request, user, **kwargs):
 
     # Crear un registro en la base de datos
     hst_usuario_accesos.objects.create(usuario=user, x_ip=ip)
+    

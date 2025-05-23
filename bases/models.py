@@ -22,6 +22,7 @@ class usuario(AbstractUser):
     n_id_sexo = models.ForeignKey(mae_est_sexos, null=True, blank=True, on_delete=models.SET_NULL)
     profile_image = models.ImageField(upload_to='img_perfil/', default='img_perfil/perfil.png',blank=True,null=True)
 
+
     groups = models.ManyToManyField(
         Group,
         through='mae_est_usuarios_groups',
