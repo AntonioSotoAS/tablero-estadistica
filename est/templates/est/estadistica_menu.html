@@ -1,80 +1,8 @@
 {% extends "base/base.html" %}
 {% load static %}
 
-{% block title %}
-INICIO :: CORTE DEL SANTA
-{% endblock  %}
-
-{% block nav %}
-{% if perms.est.list_mae_est_modulos or perms.est.list_mov_est_modulo_usuarios %}
-<nav style="padding: 40px 10px; height: 70px;" class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-    id="layout-navbar">
-    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-        <i class="ti ti-menu-2 ti-md"></i>
-        </a>
-    </div>
-
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <div class="navbar-nav align-items-center ">
-            <div class="nav-item navbar-search-wrapper mb-0">
-                <img
-                src="{% static "base/img/Icon/grafico_n.png" %}"
-                alt="user image"
-                class=" rounded p-3" width="75" height="70" />
-                
-            </div>
-            <h2 class="d-none d-md-inline-block font-weight-bold pt-4">Seguimiento Estadístico Jurisdiccional <br></h2>
-        </div>
-
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                <a
-                    class="nav-link dropdown-toggle hide-arrow p-0"
-                    href=""
-                    data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                    <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                    <a class="dropdown-item mt-0" >
-                        <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 me-2">
-                            <div class="avatar avatar-online">
-                            <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
-                            </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
-                        </div>
-                        </div>
-                    </a>
-                    </li>
-                    <li>
-                    <div class="dropdown-divider my-1 mx-n2"></div>
-                    </li>
-                    <li>
-                    <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
-                        <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
-                    </a>
-                    </li>
-                    <li>
-                    <div class="d-grid px-2 pt-2 pb-1">
-                        <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
-                        <small class="align-middle">Cerrar Sesión</small>
-                        <i class="ti ti-logout ms-2 ti-14px"></i>
-                        </a>
-                    </div>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-</nav>
-{% endif %}
-{% endblock  %}
+{% block title %} Seguimiento Estadístico Jurisdiccional :: Estadistica {% endblock %}
+{% block title_nav %} Seguimiento Estadístico Jurisdiccional {% endblock  %}
 
 {% block body_container %}
 <section class="content">
@@ -86,7 +14,7 @@ INICIO :: CORTE DEL SANTA
             <a href="{% url "est:estadistica_modulo" %}">
                 <div class="card card-border-shadow-dark h-100">
                     <div class="card-body p-4">
-                    <img src="{% static "base/img/Icon/judicial_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <img src="{% static "base/img/Svg/modulo-negro.svg" %}" class="img-fluid mx-auto d-block" onmouseover="this.src='{% static "base/img/Svg/modulo-color.svg" %}'" onmouseout="this.src='{% static "base/img/Svg/modulo-negro.svg" %}'">
                         <h5 class="mb-0 text-center">Por Módulos</h5>
                     </div>
                 </div>
@@ -97,7 +25,7 @@ INICIO :: CORTE DEL SANTA
             <a href="{% url "est:estadistica_organo" %}">
             <div class="card card-border-shadow-dark h-100">
                 <div class="card-body p-4">
-                <img src="{% static "base/Img/Icon/ley_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                <img src="{% static "base/img/Svg/organo-negro.svg" %}" class="img-fluid mx-auto d-block" onmouseover="this.src='{% static "base/img/Svg/organo-color.svg" %}'" onmouseout="this.src='{% static "base/img/Svg/organo-negro.svg" %}'">
                     <h5 class="mb-0 text-center">Por Órgano Jurisdiccional</h5>
                 </div>
             </div>
@@ -108,7 +36,7 @@ INICIO :: CORTE DEL SANTA
             <a href="{% url "est:comparar_instancias" %}">
                 <div class="card card-border-shadow-dark h-100">
                     <div class="card-body p-4">
-                        <img src="{% static "base/Img/Icon/versus_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                        <img src="{% static "base/img/Svg/vs-negro.svg" %}" class="img-fluid mx-auto d-block" onmouseover="this.src='{% static "base/img/Svg/vs-color.svg" %}'" onmouseout="this.src='{% static "base/img/Svg/vs-negro.svg" %}'">
                         <h5 class="mb-0 text-center">Comparativo Órg. Jurisdic.</h5>
                     </div>
                 </div>
@@ -119,7 +47,7 @@ INICIO :: CORTE DEL SANTA
             <a href="{% url "est:power_estadistica" %}">
                 <div class="card card-border-shadow-dark h-100">
                     <div class="card-body p-4">
-                        <img src="{% static "base/img/Icon/dashboard_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                        <img src="{% static "base/img/Svg/dashboard-negro.svg" %}" class="img-fluid mx-auto d-block" onmouseover="this.src='{% static "base/img/Svg/dashboard-color.svg" %}'" onmouseout="this.src='{% static "base/img/Svg/dashboard-negro.svg" %}'">
                         <h5 class="mb-0 text-center">Dashbord Estadistica</h5>
                     </div>
                 </div>
@@ -132,7 +60,7 @@ INICIO :: CORTE DEL SANTA
             <a href="{% url "est:power_jornada" %}">
                 <div class="card card-border-shadow-dark h-100">
                     <div class="card-body p-4">
-                        <img src="{% static "base/img/Icon/dashboard_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                        <img src="{% static "base/img/Svg/dashboard-negro.svg" %}" class="img-fluid mx-auto d-block" onmouseover="this.src='{% static "base/img/Svg/dashboard-color.svg" %}'" onmouseout="this.src='{% static "base/img/Svg/dashboard-negro.svg" %}'">
                         <h5 class="mb-0 text-center">Jornada Extraordinaria</h5>
                     </div>
                 </div>
@@ -143,8 +71,19 @@ INICIO :: CORTE DEL SANTA
             <a href="{% url "est:power_nepena" %}">
                 <div class="card card-border-shadow-dark h-100">
                     <div class="card-body p-4">
-                        <img src="{% static "base/img/Icon/dashboard_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                        <img src="{% static "base/img/Svg/dashboard-negro.svg" %}" class="img-fluid mx-auto d-block" onmouseover="this.src='{% static "base/img/Svg/dashboard-color.svg" %}'" onmouseout="this.src='{% static "base/img/Svg/dashboard-negro.svg" %}'">
                         <h5 class="mb-0 text-center">Dashboard Juzgado de Nepeña</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-sm-6 mb-3">
+            <a href="{% url "est:power_nepena" %}">
+                <div class="card card-border-shadow-dark h-100">
+                    <div class="card-body p-4">
+                        <img src="{% static "base/img/Icon/dashboard_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                        <h5 class="mb-0 text-center">Listado de Jueces</h5>
                     </div>
                 </div>
             </a>

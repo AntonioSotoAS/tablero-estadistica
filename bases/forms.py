@@ -11,65 +11,72 @@ from .models import usuario
 #!============UNIDADES ADMINISTRATIVAS ===============
 #!====================================================
 class UsuarioForm(forms.ModelForm):
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Ingrese su contraseña"})
+    )
+
     class Meta:
         model = usuario
-        fields = ['x_app_paterno','x_app_materno','x_nombres','n_id_sexo','x_dni','email','username','password','profile_image']
-        widgets = {'password': forms.PasswordInput(),
-            'email': forms.EmailInput(),
-            'x_app_paterno':forms.TextInput(attrs={
-                'class':'form-control',
-                'placeholder':'Ingrese su Apellido Paterno',
-                'style':'text-transform:uppercase'
-                }),
-            'x_app_materno':forms.TextInput(attrs={
-                'class':'form-control',
-                'placeholder':'Ingrese su Apellido Materno',
-                'style':'text-transform:uppercase'
-                }),
-            'x_nombres':forms.TextInput(attrs={
-                'class':'form-control',
-                'placeholder':'Ingrese su Nombre',
-                'style':'text-transform:uppercase'
-                }),
-            'n_id_sexo':Select2Widget(attrs={'class':'form-control'})}
-        
-    def __init__(self,*args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in iter (self.fields):
-            self.fields[field].widget.attrs.update({
-                'class':'form-control',
-                'placeholder': f'Ingrese {field.replace("_", " ")}',
-            })
-            self.fields['password'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Ingrese su contraseña',
-            })
-            self.fields['email'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Ingrese su correo electrónico',
-            'type': 'email',  # Tipo email
-            })
+        fields = [
+            'x_app_paterno','x_app_materno','x_nombres','n_id_sexo','x_dni',
+            'email','username','password','profile_image','x_telefono','l_mensaje'
+        ]
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su correo electrónico'}),
+            'n_id_sexo': Select2Widget(attrs={'class': 'form-select'}),
+
+            # Campos de texto con upper excepto teléfono
+            'x_app_paterno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Apellido Paterno', 'style': 'text-transform:uppercase'}),
+            'x_app_materno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Apellido Materno', 'style': 'text-transform:uppercase'}),
+            'x_nombres': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Nombre', 'style': 'text-transform:uppercase'}),
+            'x_dni': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su DNI', 'maxlength': '8'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su usuario'}),
+            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+
+            # Teléfono: sin uppercase
+            'x_telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Teléfono'}),
+
+            # Switch para l_mensaje
+            'l_mensaje': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
+        }
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Hashear contraseña
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+            # Si usas grupos intermedios u otras relaciones, guárdalas aquí
+            self.save_m2m()
+        return user
+
 
 class UsuarioEditForm(forms.ModelForm):
+    # Si quieres mostrar algo de contraseña (solo lectura), descomenta:
+    # password = ReadOnlyPasswordHashField(label="Contraseña", help_text="Para cambiar la contraseña usa el formulario de cambio de contraseña.")
+
     class Meta:
         model = usuario
-        fields = ['x_app_paterno','x_app_materno','x_nombres','n_id_sexo','x_dni','email','username','profile_image']
-        widgets = {'password': forms.PasswordInput(),
-            'email': forms.EmailInput(),
-            'n_id_sexo':Select2Widget(attrs={'class':'form-control'})}
-        
-    def __init__(self,*args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in iter (self.fields):
-            self.fields[field].widget.attrs.update({
-                'class':'form-control',
-                'placeholder': f'Ingrese {field.replace("_", " ")}',
-            })
-            self.fields['email'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Ingrese su correo electrónico',
-            'type': 'email',  # Tipo email
-            })
+        fields = [
+            'x_app_paterno','x_app_materno','x_nombres','n_id_sexo','x_dni',
+            'email','username','profile_image','x_telefono','l_mensaje'
+        ]
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su correo electrónico'}),
+            'n_id_sexo': Select2Widget(attrs={'class': 'form-select'}),
+
+            'x_app_paterno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Apellido Paterno', 'style': 'text-transform:uppercase'}),
+            'x_app_materno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Apellido Materno', 'style': 'text-transform:uppercase'}),
+            'x_nombres': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Nombre', 'style': 'text-transform:uppercase'}),
+            'x_dni': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su DNI', 'maxlength': '8'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su usuario'}),
+            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'x_telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su Teléfono'}),
+            'l_mensaje': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
+        }
 
 
 class UsuarioPassForm(forms.Form):

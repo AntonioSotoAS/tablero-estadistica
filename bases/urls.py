@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 from bases import views
 from django.views.generic import TemplateView
 #VISTAS
-from bases.views import Home, UserView, GroupView,UserPasswordChangeView,\
+from bases.views import Home, UserView, UsuarioCreateView, GroupView,UserPasswordChangeView,\
                         UserNew, user_group_admin, custom_logout_view, group_delete, group_permiso, group_user, UserPassEdit, \
                         UserDeleteView, UserActivarView, UserAssignModulesView,\
                         listar_accesos
@@ -34,6 +34,7 @@ urlpatterns = [
     path('Presidencia/JornadaExtraordinaria/',views.Jornada,name='pre_power_jornada'),
     path('Presidencia/Nepena/',views.Nepena,name='pre_power_nepena'),    
 
+    path('usuario/crear/', UsuarioCreateView.as_view(), name='user_create'),
     path('usuarios/',UserView.as_view(),name="user_list"),
     path('usuarios/nuevo',UserNew,name="user_new"),
     path('usuarios/editar/<int:pk>',UserNew,name="user_edit"),
@@ -51,5 +52,5 @@ urlpatterns = [
     # Puedes añadir una URL adicional para mostrar el mensaje de éxito:
     path('cambiar-password/hecho/', TemplateView.as_view(template_name='bases/password_change_done.html'), name='password_change_done'),   
 
-    path('accesos/', listar_accesos, name='listar_accesos'),
+    path('accesos/', listar_accesos, name='auditoria_login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

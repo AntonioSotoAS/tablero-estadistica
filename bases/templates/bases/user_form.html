@@ -3,10 +3,32 @@
 
 {% comment %} TITULO DE PÁGINA {% endcomment %}
 {% block title %} Nuevo Usuario {% endblock %}
+{% block title_nav %} Nuevo Usuario {% endblock %}
+
+{% block select_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/bootstrap-select/bootstrap-select.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/form-validation/form-validation.css' %}" />
+{% endblock  %}
+
+{% block stepper_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/stepper/stepper.css' %}" />
+{% endblock  %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/fonts/tabler-icons.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/fonts/flag-icons.css' %}" />
+<link rel="stylesheet" href="{% static 'base/css/cards-advance.css' %}" />
+{% endblock  %}
+
+{% block datatable_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+{% endblock  %}
 
 {% comment %} CUERPO DEL CONTENIDO {% endcomment %}
 {% block body_container %}
-
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
         <div class="col-12">
@@ -111,7 +133,6 @@
                             <div class="col-sm-6">
                               <label class="form-label" for="email">Sexo</label>
                                 {{form.n_id_sexo}}
-
                             </div>
 
                             <div class="col-sm-6 form-password-toggle">
@@ -153,6 +174,24 @@
                         <!-- Personal Info -->
                         <div id="personal-info" class="content">
                           <div class="row g-6">
+
+                            <div class="col-sm-6">
+      <label class="form-label">Teléfono:</label>
+      <div class="input-group input-group-merge">
+        <span class="input-group-text"><i class="ti ti-phone"></i></span>
+        {{ form.x_telefono }}
+      </div>
+      <div class="form-text">Ejemplo: 999888777 o +51 999888777</div>
+    </div>
+
+    <div class="col-sm-6">
+      <label class="form-label d-block">Mensajes / Notificaciones:</label>
+      <div class="form-check form-switch">
+        {{ form.l_mensaje }}
+        <label class="form-check-label ms-2">Habilitar mensajes (WhatsApp/SMS/Email)</label>
+      </div>
+    </div>
+
                             <div class="col-sm-6">
                               <label class="form-label" for="first-name">Usuario:</label>
                               <div class="input-group input-group-merge">
@@ -216,7 +255,7 @@
                                       <td>{{item.name}}</td>
                                       <td>
                                           <a href="" class="btn btn-sm btn-cirlce btn-danger" onclick="permiso('{{item.id}}','DEL')">
-                                              <i class="far fa-trash-alt"></i>
+                                              <svg xmlns="http://www.w3.org/2000/svg" width="15" viewBox="0 0 448 512"><path fill="currentColor" d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/></svg>
                                           </a>
                                       </td>
                                   </tr>
@@ -249,7 +288,7 @@
                                       <td class="text-uppercase">{{item.name}}</td>
                                       <td>
                                           <a href="#" type="button" class="btn btn-sm btn-success btn-circle" onclick="permiso('{{item.id}}','ADD')">
-                                              <i class="fas fa-plus"></i>
+                                              <svg xmlns="http://www.w3.org/2000/svg" width="15" viewBox="0 0 448 512"><path fill="currentColor" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
                                           </a>
                                       </td>
                                   </tr>
@@ -321,5 +360,22 @@
     $(document).ready(function() {
       $('#id_n_id_sexo').select2();  // Reemplaza con el ID del campo generado
   });
-  </script>
+</script>
+{% endblock %}
+
+{% block form_js %}
+<script src="{% static 'base/vendor/bootstrap-select/bootstrap-select.js' %}"></script>
+<script src="{% static 'base/vendor/select2/select2.js' %}"></script>
+<script src="{% static 'base/vendor/form-validation/popular.js' %}"></script>
+<script src="{% static 'base/vendor/form-validation/bootstrap5.js' %}"></script>
+<script src="{% static 'base/vendor/form-validation/auto-focus.js' %}"></script>
+{% endblock %}
+
+{% block stepper_js %}
+<script src="{% static 'base/vendor/stepper/stepper.js' %}"></script>
+<script src="{% static 'base/vendor/stepper/form-wizard-numbered.js' %}"></script>
+{% endblock %}
+
+{% block datatable_js %}
+<script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
 {% endblock %}

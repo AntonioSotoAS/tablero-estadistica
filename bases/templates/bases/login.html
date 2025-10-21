@@ -146,24 +146,20 @@ Haredará el contenido de base.html
 </style>
 
 <body>
-  <div class="authentication-wrapper authentication-cover">
-
-
+  <div class="authentication-wrapper ">
     <div class="authentication-inner row m-0">
-      <!-- /Left Text -->
-      <div class="d-none d-lg-flex col-xl-8 p-0">
-        <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center">
-          <img src={% static "base/img/Svg/estadistica.svg" %} class="my-5 auth-illustration" alt="Perfil PJ">
-          <img src={% static "base/img/bg-light.png" %} class="platform-bg" alt="Perfil PJ">
-        </div>
+      <div class="col-md-8 col-12 d-none d-md-flex align-items-center justify-content-center text-center p-5" 
+          style="background: url('{% static 'base/img/fondo_login.png' %}') no-repeat center center; background-size: cover;">
+        <img src="{% static 'base/img/logo_estadistica.png' %}" alt="Logo SARA" class="img-fluid" style="max-width: 80%;">
       </div>
-      <!-- /Left Text -->
 
       <!-- Login -->
       <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-sm-12 p-6">
         <div class="w-px-400 mx-auto mt-12 pt-5">
-          <img src="{% static "base/img/JusticiaTiempoReal.png" %}" class="img-fluid w-75 mx-auto d-block" alt="Logo">
-          <h4 class="mb-1 text-center font-weight-bold">Bienvenido al Sistema Estadistico</h4>
+
+          <img src="{% static "base/img/logo_corte.png" %}" class="img-fluid w-75 mx-auto d-block" alt="Logo">
+
+          <h2 class="mb-1 text-center font-weight-bold mt-5">Inicia Sesión</h2>
 
           <form method="post">
             {% csrf_token %}
@@ -207,7 +203,6 @@ Haredará el contenido de base.html
   </div>
 
 </body>
-
 
 {% endblock %}
 

@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-ge6eb4!geczm!qujr6rw$ntpry$7zi!@xu_)^^34c#+n(l8*#+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', '172.17.78.63']
+ALLOWED_HOSTS = ['*', '192.168.18.64']
 AUTH_USER_MODEL = 'bases.usuario'
 
 # Application definition
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bases',
     'est',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -65,40 +66,28 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 #HOSTING
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'zodgiwxd_estadisticacsjsanta',
+#        'USER': 'zodgiwxd_userestadistica',
+#        'PASSWORD':'Infor@123456',
+#        'HOST':'75.102.57.41',
+#        'PORT':3306
+#    }
+#}
+
+#LOCAL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zodgiwxd_estadisticacsjsanta',
-        'USER': 'zodgiwxd_userestadistica',
-        'PASSWORD':'Infor@123456',
-        'HOST':'75.102.57.41',
+        'NAME': 'csjsanta_indicadores',
+        'USER': 'root',
+        'PASSWORD':'naruto20',
+        'HOST':'localhost',
         'PORT':3306
     }
 }
-
-#LOCAL
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': 'csjsanta_indicadores',
-#        'USER': 'root',
-#        'PASSWORD':'Pj123456*',
-#        'HOST':'localhost',
-#        'PORT':3306
-#    }
-#}
-
-#SERVIDOR
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': 'csjsanta_indicadores',
-#        'USER': 'root',
-#        'PASSWORD':'Pj123456*',
-#        'HOST':'localhost',
-#        'PORT':3306
-#    }
-#}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -144,3 +133,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+SESSION_COOKIE_AGE = 30 * 60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
+
+PWA_APP_NAME = 'SARAPJ'
+PWA_APP_DESCRIPTION = "Esta es mi app Django convertida a PWA"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_START_URL = '/'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_ICONS = [
+    {
+        "src": "/static/base/img/Icon/grafico.png",
+        "sizes": "192x192"
+    },
+    {
+        "src": "/static/base/img/Icon/grafico.png",
+        "sizes": "512x512"
+    }
+]
+

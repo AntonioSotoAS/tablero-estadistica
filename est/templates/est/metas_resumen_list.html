@@ -1,0 +1,453 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %} Metas - Resúmenes {% endblock %}
+
+    {% block datatable_css %}
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+    {% endblock  %}
+
+{% block body_container %}
+
+<style>
+  /* Solo afecta a tablas dentro de .tabla-borde-negro */
+  .tabla-borde-negro { --bs-border-color: #000; }
+</style>
+
+<div class="container-fluid py-5">
+
+  <div class="card">
+<div class="card-header d-flex align-items-center justify-content-between mb-3">
+  <h4 class="mb-0">Metas (Resumenes)</h4>
+  <button id="btnGuardarTodo" class="btn btn-primary btn-sm">
+    Guardar todo
+  </button>
+</div>
+
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered border-dark" id="tablaMetaResumen">
+          <thead class="table-light">
+            <tr>
+              <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">#</th>
+              {% comment %} <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">NRO SIGA</th>{% endcomment %}
+              <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">DEPENDENCIA</th>
+              <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">ESTANDAR DE PRODUC.</th>
+              <th style="font-size:10px; background: #595959" class="text-white text-center px-1">CARGA PROCESAL INICIAL EN TRAMITE 2025</th>
+              <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">ING. <br> TOTAL</th>
+              <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">INGRESOS PROYECTADOS</th>
+              <th style="font-size:10px; background: #595959" class="text-white text-center px-1">CARGA PROCESAL EN TRÁMITE 2025</th>
+              <th style="font-size:10px; background: #4F6228;" class="text-white text-center px-1">CARGA PROCESAL MÍNIMA ANUAL</th>
+              <th style="font-size:10px; background: #4F6228;" class="text-white text-center px-1">CARGA PROCESAL MÁXIMA ANUAL</th>
+              <th style="font-size:10px; background: #C00000;" class="text-white text-center px-1">META <br>PRELIMINAR <br>PROYECTADA 2025</th>
+              <th style="font-size:10px; background: #16365C;" class="text-white text-center px-1">SITUACIÓN <br>DE LA CARGA <br> EN TRÁMITE</th>
+              <th style="font-size:10px; background: #4BACC6;" class="text-white text-center px-1">OTROS <br>EGRESOS <br>A OTRA DEP. EN TRÁMITE</th>
+              <th style="font-size:10px; background: #538DD5;" class="text-white text-center px-1">ACTIVAR <br>Otros egresos a otra depen</th>
+              <th style="font-size:10px; background: #4BACC6;" class="text-white text-center px-1">INGRESOS DE OTRA DEP. EN TRAMITE</th>
+              <th style="font-size:10px; background: #538DD5;" class="text-white text-center px-1">ACTIVAR ingresos de otra dep en tramite</th>
+              <th style="font-size:10px; background: #4BACC6;" class="text-white text-center px-1">PEND. EN RESERVA</th>
+              <th style="font-size:10px; background: #538DD5;" class="text-white text-center px-1">ACTIVAR pendiente en reserva</th>
+              <th style="background: #16365C;  font-size:10px;" class="text-white text-center px-1">VALOR <br>AGREGADO</th>
+              <th style="background: #16365C;  font-size:10px;" class="text-white text-center px-1">VALOR <br>OPJ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in items %}
+            <tr
+              data-tram-ini="{{ r.n_carg_procesal_ini }}"
+              data-ingreso="{{ r.m_t_ingreso }}"
+              data-ingproj="{{ r.m_ing_proyectado }}"
+              data-pendmes="{{ r.m_pend_reserva|default:0 }}"
+              data-ingajus="{{ r.ing_ajustado_feb|default:0 }}"   
+              data-egreajus="{{ r.egre_ajustado_feb|default:0 }}" 
+            >
+              <td style="font-size:11px">{{ forloop.counter }}</td>   {# COLUMNA A: ID #}
+              {% comment %}<td style="font-size:11px;" class="bg-label-info text-dark">{{ r.n_instancia_id }}</td>   {# COLUMNA B: NRO SIGA #} {% endcomment %}
+              <td style="font-size:11px;" class="bg-label-info text-dark">{{ r.n_instancia.x_nom_instancia }}</td>    {# COLUMNA C: DEPENDENCIA #}
+              <td style="font-size:11px;font-size:11px">{{ r.m_estandar_prod }}</td>    {# COLUMNA F:ESTANDAR DE PRODUCC. #}
+              <td style="font-size:11px;background:#D9D9D9" class="text-dark text-center td-tram-ini">{{ r.n_carg_procesal_ini }}</td>    {# COLUMNA G: CARGA PROCESAL INICIAL EN TRAMITE 2025 #}
+              <td style="font-size:11px" class="td-ing-total">{{ r.m_t_ingreso }}</td>   {# COLUMNA H: ING. TOTAL #}
+              <td style="font-size:11px" class="td-ing-proy">{{ r.m_ing_proyectado }}</td>    {# COLUMNA I: INGRESOS PROYECTADOS #}
+              <td class="text-dark text-center td-carga" style="font-size:11px;background:#D9D9D9">   {# COLUMNA J: CARGA PROCESAL EN TRAMITE 2025 #}
+                {{ r.n_carg_procesal }}
+              </td>
+              <td style="font-size:11px;background:#D8E4BC" class="text-dark text-center">{{ r.m_carg_procesal_min }}</td>    {# COLUMNA K: CARGA PROCESAL MINIMA #}
+              <td style="font-size:11px;background:#D8E4BC" class="text-dark text-center">{{ r.m_carg_procesal_max }}</td>    {# COLUMNA L: CARGA PROCESAL MAXIMA #}
+              <td class="text-dark text-center meta-preliminar" data-meta-base="{{ r.m_meta_preliminar }}" style="font-size:11px; background:#E6B8B7"> {# COLUMNA M: META PRELIMINAR PROYECTADA 2025 #} 
+                {{ r.m_meta_preliminar }}
+              </td>   
+              <td style="font-size:11px;" class="{% if r.x_situacion_carga == "SOBRECARGA" %} bg-danger text-white {% elif r.x_situacion_carga == "SUBCARGA" %} bg-success text-white
+                        {% elif r.x_situacion_carga == "ESTANDAR" %} bg-warning {% endif %} text-dark font-weight-bold text-center">    {# COLUMNA N: SITUACION DE LA CARGA EN TRAMITE #}
+                {{ r.x_situacion_carga }}
+              </td>
+              <td style="font-size:11px;" class="text-center td-egre-otra">{{ r.m_egre_otra_dep|default:"0" }}</td>    {# COLUMNA S: OTROS EGRESOS A OTRA DEP. EN TRAMITE #}
+              <td class="text-center" style="background:#92D050">   {# COLUMNA T: ACTIVAR OTROS EGRESOS A OTRA DEPEN #}
+                <div class="form-check form-switch d-inline-block">
+                  <input class="form-check-input chk-op-egre"
+                        type="checkbox"
+                        data-inst="{{ r.n_instancia_id }}"
+                        {% if r.m_op_egre_otra_dep %}checked{% endif %}>
+                </div>
+              </td>
+              <td style="font-size:11px" class="text-center td-ing-otra">{{ r.m_ing_otra_dep }}</td>    {# COLUMNA U: INGRESOS DE OTRA DEP. EN  TRAMITE #}
+              <td class="text-center" style="background:#C5D9F1">   {# COLUMNA V: ACTIVAR INGRESOS DE OTRA DEP EN TRAMITE  #}
+                <div class="form-check form-switch d-inline-block">
+                  <input class="form-check-input chk-op-ing"
+                        type="checkbox"
+                        data-inst="{{ r.n_instancia_id }}"
+                        {% if r.m_op_ing_otra_dep %}checked{% endif %}>
+                </div>
+              </td>
+              <td style="font-size:11px" class="text-center td-pend-mes">{{ r.m_pend_reserva }}</td>    {# COLUMNA W: PEND. EN RESERVA  #}
+              <td class="text-center" style="background:#C5D9F1">   {# COLUMNA X: ACTIVAR PENDIENTE EN RESERVA #}
+                <div class="form-check form-switch d-inline-block">
+                  <input class="form-check-input chk-op-pend"
+                        type="checkbox"
+                        data-inst="{{ r.n_instancia_id }}"
+                        {% if r.m_op_pend_reserva %}checked{% endif %}>
+                </div>
+              </td>
+              <td style="font-size:11px; width:120px;">   {#  VALOR AGREGADO #}
+                <input type="number"
+                class="form-control form-control-sm txt-valor-agregado"
+                data-pk="{{ r.pk }}"
+                value="{{ r.valor_mod_guardado|default:'' }}"
+                placeholder="0" step="1">
+              </td>
+              <td style="font-size:11px; width:120px;">   {# VALOR OPJ #}
+                <input type="number"
+                      class="form-control form-control-sm txt-meta-opj"
+                      data-pk="{{ r.pk }}"
+                      placeholder="0"
+                      step="1">
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="27" class="text-center text-muted py-4">Sin registros</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+    {% block datatable_js %}
+    <script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
+    {% endblock %}
+
+        {% block datatable %}
+    <script>
+        $(document).ready(function(){
+            $('.table').DataTable({
+                "pageLength": 15, // Muestra 25 filas por página al cargar
+                "lengthMenu": [ [15,30, 50, 100, -1], [15,30, 50, 100, "Todos"] ],
+                autoWidth: false,
+                responsive: false,
+                scrollX: true,
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
+    </script>
+    {% endblock  %}
+
+{% block script %}
+<script>
+  // ---- CSRF helper ----
+  function getCookie(name) {                     
+    let cookieValue = null;                      
+    if (document.cookie && document.cookie !== '') { 
+      const cookies = document.cookie.split(';');    
+      for (let i = 0; i < cookies.length; i++) {     
+        const cookie = cookies[i].trim();           
+        if (cookie.substring(0, name.length + 1) === (name + '=')) { 
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); 
+          break;                                     
+        }
+      }
+    }
+    return cookieValue;                             
+  }
+  const csrftoken = getCookie('csrftoken');         
+
+  // ---- Parámetros de periodo desde el contexto Django ----
+  const MES_ACTUAL_SIN_FEB = {{ mes_actual_sin_feb|default:0 }}; // month - 1 // Inyecta desde Django el número de meses transcurridos (excluyendo febrero si aplica).
+  const MESES_FALTA        = {{ meses_falta|default:0 }};        // 12 - month // Inyecta desde Django los meses que faltan para completar el año.
+
+  {# ####### Utilidades ###### #}
+  {# Función utilitaria para convertir un valor a entero seguro. #}
+  function toInt(v){                                 
+    if(v===''||v===null||v===undefined) return 0;    // Maneja valores vacíos/nulos/indefinidos devolviendo 0.
+    v=(''+v).replace(/[^\d-]/g,'');                  // Convierte a string y elimina todo lo que no sea dígitos o signo '-'.
+    const n=parseInt(v,10);                          // Parsea el string como entero base 10.
+    return isNaN(n)?0:n;                             // Si no es número, retorna 0; de lo contrario, el número.
+  }
+  function formatMiles(n){                            // Función para formatear números con separadores de miles.
+    return (''+n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); // Inserta comas cada tres dígitos desde la derecha.
+  }
+
+  // ---- DataTable (una sola vez) ----
+  let dtMeta = null;                                  // Variable para almacenar la instancia de DataTable.
+  const TABLE_ID = '#tablaMetaResumen';               // Selector del ID de la tabla a transformar en DataTable.
+
+  // Helper: obtener número de una celda si existe
+  function getNumFromCell($tr, selector){             // Función que busca un elemento dentro de la fila y obtiene un número.
+    const $el = $tr.find(selector);                   // Busca el elemento hijo por selector en la fila dada.
+    if (!$el.length) return 0;                        // Si no existe, devuelve 0.
+    const raw = $el.text()                            // Intenta obtener el texto del elemento (por ejemplo, de una celda).
+               || $el.val()                           // Si no tiene texto, intenta obtener su valor (si es input).
+               || '0';                                // Valor por defecto '0' si no hay nada.
+    return toInt(raw);                                // Convierte el valor obtenido a entero seguro.
+  }
+
+  /* --- Helper: escribe valor y resalta SOLO si cambió --- */
+  function setCellIfChanged($td, newValue) {
+    const formatted = formatMiles(newValue);                 // Formatea miles
+    const prev = $td.data('prev');                           // Lee el valor previo guardado
+
+    if (prev === undefined) {
+      // Primera vez: escribe SIN marcar como cambio
+      $td.text(formatted);
+      $td.data('prev', newValue);                            // Guarda como base de comparación
+      $td.removeClass('font-weight-bold fs-5');              // Asegura sin resaltado
+      return;
+    }
+
+    // Si cambió, resalta; si no, quita resaltado
+    if (prev !== newValue) {
+      $td.text(formatted).addClass('font-weight-bold fs-5');
+    } else {
+      $td.text(formatted).removeClass('font-weight-bold fs-5');
+    }
+
+    // Actualiza el "prev" para la próxima comparación
+    $td.data('prev', newValue);
+  }
+
+  // Recalcula UNA fila
+  function recalcRow($tr){                            // Función principal que recalcula los campos derivados de una fila.
+    // Base
+    const n_carg_procesal_ini = toInt($tr.data('tram-ini')); // Lee el atributo data-tram-ini (carga procesal inicial) y lo convierte a entero.
+    const m_t_ingreso         = toInt($tr.data('ingreso'));  // Lee el atributo data-ingreso (total de ingresos del año) como entero.
+    const pend_reserva_mes    = toInt($tr.data('pendmes'));  // Lee el atributo data-pendmes (pendiente en reserva del mes) como entero.
+    const m_t_ingreso_mes     = toInt($tr.data('ingajus')) || 0; // Lee data-ingajus (ingreso ajustado del mes actual) o 0 si no existe.
+
+    // Switches
+    const opEgre = $tr.find('.chk-op-egre').is(':checked') ? 1 : 0; // Convierte el check "egresos a otra dep." a flag 1/0.
+    const opIng  = $tr.find('.chk-op-ing').is(':checked')  ? 1 : 0; // Convierte el check "ingresos de otra dep." a flag 1/0.
+    const opPend = $tr.find('.chk-op-pend').is(':checked') ? 1 : 0; // Convierte el check "pendiente en reserva" a flag 1/0.
+    console.log("Switches: Egre=" + opEgre + ", Ing=" + opIng + ", Pend=" + opPend);
+
+    // Valores de columnas S y U
+    const m_egre_otra_dep = getNumFromCell($tr, '.td-egre-otra'); // Lee el número de la celda con egresos a otra dependencia.
+    const m_ing_otra_dep  = getNumFromCell($tr, '.td-ing-otra');  // Lee el número de la celda con ingresos de otra dependencia.
+    const m_pend_reserva  = getNumFromCell($tr, '.td-pend-mes');  // Lee el número de la celda con ingresos de otra dependencia.
+
+    
+    // INGRESOS PROYECTADO ---> m_ing_proyectado
+    // Numerador incluye AMBOS switches:
+    //  (m_t_ingreso - m_t_ingreso_mes) + (opIng? +m_ing_otra_dep:0) - (opEgre? m_egre_otra_dep:0)
+    let proyeccion = 0;                                  // Inicializa la proyección en 0.
+    if (MES_ACTUAL_SIN_FEB > 0) {                        // Solo calcula si hay meses transcurridos (evita dividir por 0).
+      const numerador = (m_t_ingreso - m_t_ingreso_mes) - (opEgre ? m_egre_otra_dep : 0) - (opIng  ? m_ing_otra_dep  : 0) ;  // Si aplica egreso a otra dep., lo resta.
+      proyeccion = Math.round((numerador / MES_ACTUAL_SIN_FEB) * MESES_FALTA); // Promedia por mes y proyecta a meses faltantes.
+      if (proyeccion < 0) proyeccion = 0;                // Asegura que la proyección no sea negativa.
+      console.log("Los Ingresos proyectados es:" + proyeccion);
+    }
+
+    // Pintar y guardar data
+    const $tdIngProy = $tr.find('.td-ing-proy');                          // Selecciona la celda donde se muestra m_ing_proyectado.
+      if ($tdIngProy.length) { setCellIfChanged($tdIngProy, proyeccion);} // Escribe la proyección formateada si la celda existe.
+    $tr.data('ingproj', proyeccion);                                      // Guarda la proyección en data-ingproj de la fila.
+
+    // === m_carg_procesal_tram ===
+    const m_carg_procesal_tram =  (n_carg_procesal_ini + m_t_ingreso + proyeccion) - (pend_reserva_mes * opPend);
+    console.log(n_carg_procesal_ini);
+    console.log(m_t_ingreso);
+    console.log(proyeccion);
+    console.log(pend_reserva_mes);
+    console.log(opPend);
+    console.log("La carga procesal en trámite es:" + m_carg_procesal_tram);
+
+    const $tdCarga = $tr.find('.td-carga');                                         // Selecciona la celda donde se muestra la carga procesal en trámite.
+      if ($tdCarga.length) { setCellIfChanged($tdCarga, m_carg_procesal_tram); }    // Escribe el valor formateado en la celda.
+    }
+
+  // Eventos: switches afectan el cálculo
+  $(document).on('change', '.chk-op-egre, .chk-op-ing, .chk-op-pend', function(){ // Escucha cambios en los tres switches.
+    const $tr = $(this).closest('tr');                   // Ubica la fila de la celda donde ocurrió el cambio.
+    recalcRow($tr);                                      // Recalcula todos los derivados de esa fila.
+  });
+
+  // Inputs numéricos (si en tu lógica futura afectan ingreso/proyección)
+  $(document).on('input', '.txt-valor-agregado, .txt-meta-opj', function(){ // Escucha cambios de texto en inputs relevantes.
+    const $tr = $(this).closest('tr');                   // Ubica la fila correspondiente al input modificado.
+    recalcRow($tr);                                      // Recalcula la fila para reflejar el cambio.
+  });
+
+  // Inicialización y cálculos iniciales
+  $(function () {                                        // Handler que se ejecuta cuando el DOM está listo.
+    // DataTable
+    if (!$.fn.DataTable.isDataTable(TABLE_ID)) {         // Verifica si la tabla aún no fue inicializada como DataTable.
+      dtMeta = $(TABLE_ID).DataTable({                   // Inicializa DataTable sobre la tabla indicada.
+        pageLength: 15,                                  // Número de filas por página por defecto.
+        lengthMenu: [[15,30,50,100,-1],[15,30,50,100,'Todos']], // Opciones de paginación (valores y etiquetas).
+        autoWidth: false,                                // Desactiva el cálculo automático de anchos de columna.
+        responsive: false,                               // Desactiva el modo responsivo (se usa scrollX).
+        scrollX: true,                                   // Habilita scroll horizontal para tablas anchas.
+        language: {                                      // Traducciones/etiquetas al español para la UI de DataTable.
+          sProcessing: "Procesando...",
+          sLengthMenu: "Mostrar _MENU_ registros",
+          sZeroRecords: "No se encontraron resultados",
+          sEmptyTable: "Ningún dato disponible en esta tabla",
+          sInfo: "Mostrando _START_ a _END_ de _TOTAL_",
+          sInfoEmpty: "Mostrando 0 a 0 de 0",
+          sInfoFiltered: "(filtrado de _MAX_)",
+          sSearch: "Buscar:",
+          oPaginate: { sFirst:"Primero", sLast:"Último", sNext:"Siguiente", sPrevious:"Anterior" }
+        },
+        columnDefs: [                                    // Definiciones específicas por columnas.
+          { targets: [18, 19], orderable: false, searchable: false } // Desactiva orden y búsqueda en columnas con inputs/switches.
+        ]
+      });
+    } else {
+      dtMeta = $(TABLE_ID).DataTable();                  // Si ya existe, recupera la instancia de DataTable.
+    }
+
+    // Cálculo inicial por fila
+    $(`${TABLE_ID} tbody tr`).each(function(){           // Itera todas las filas del cuerpo de la tabla.
+      recalcRow($(this));                                // Recalcula cada fila para inicializar valores derivados.
+    });
+
+    // Si "valor agregado" viene precargado, dispara para refrescar meta preliminar (visual)
+    $('.txt-valor-agregado').each(function(){            // Itera sobre todos los inputs de "valor agregado".
+      if ($(this).val() !== '')                          // Si el input ya tiene un valor precargado (no vacío)...
+        $(this).trigger('input');                        // Dispara el evento input para refrescar el cálculo visual.
+    });
+  });
+
+  // Recalcular al redibujar (paginación/filtros)
+  $(document).on('draw.dt', function(){                  // Evento global que dispara DataTable cuando redibuja la tabla.
+    $(`${TABLE_ID} tbody tr`).each(function(){           // Recorre nuevamente las filas visibles tras el redibujado.
+      recalcRow($(this));                        // Vuelve a calcular cada fila (útil al cambiar de página/filtro).
+    });
+  });
+
+  // ---- META PRELIMINAR en vivo (suma base + delta, solo visual) ----
+  $(document).on('input', '.txt-valor-agregado', function(){ // Escucha cambios de texto en el campo "valor agregado".
+    const $tr   = $(this).closest('tr');                 // Ubica la fila actual.
+    const $meta = $tr.find('.meta-preliminar');          // Selecciona el elemento que muestra la meta preliminar.
+    const base  = toInt($meta.data('meta-base'));        // Lee el valor base desde data-meta-base y lo convierte a entero.
+    const delta = toInt($(this).val());                  // Convierte el texto ingresado (delta) a entero.
+    const nuevo = base + delta;                          // Calcula la nueva meta preliminar (solo visual).
+
+    if (delta !== 0) {                                   // Si hay un delta distinto de cero...
+      $meta.addClass('font-weight-bold fs-5'); // Resalta la meta para indicar cambio visual.
+    } else {                                             // Si el delta es 0...
+      $meta.removeClass('font-weight-bold fs-5'); // Quita el resaltado.
+    }
+    $meta.text(formatMiles(nuevo));                      // Actualiza el texto de la meta con separador de miles.
+  });
+
+  $(document).on('change', '.txt-valor-agregado', function(){ // Maneja el evento change (al perder foco o confirmar).
+    if ($(this).val() === '') {                         // Si el campo queda vacío...
+      const $tr   = $(this).closest('tr');              // Ubica la fila.
+      const $meta = $tr.find('.meta-preliminar');       // Selecciona el elemento de meta preliminar.
+      const base  = toInt($meta.data('meta-base'));     // Recupera el valor base original.
+      $meta.text(formatMiles(base))                     // Restaura el texto a la meta base formateada.
+           .removeClass(' font-weight-bold fs-5'); // Quita resaltado visual.
+    }
+  });
+
+  // ---- Guardar TODO (incluye filas sin cambios: delta=0) ----
+  $('#btnGuardarTodo').on('click', function(){           // Cuando se hace clic en el botón "Guardar todo"...
+    const $btn=$(this);                                  // Guarda referencia al botón clicado.
+    $btn.prop('disabled', true).text('Guardando...');    // Deshabilita el botón y cambia su texto mientras procesa.
+
+    const items = [];                                    // Inicializa el arreglo de ítems a enviar al backend.
+    const nodes = dtMeta.rows({search:'applied'}).nodes(); // Obtiene los nodos (filas) aplicando el filtro de búsqueda activo.
+
+    $(nodes).each(function(){                            // Itera cada fila visible/filtrada.
+      const $tr    = $(this);                            // Guarda la fila como objeto jQuery.
+      const $valor = $tr.find('.txt-valor-agregado');    // Selecciona el input con el delta de valor agregado.
+      const $opj   = $tr.find('.txt-meta-opj');          // Selecciona el input con la meta OPJ (si existe en tu DOM).
+
+      const opEgre = $tr.find('.chk-op-egre').is(':checked'); // Lee el estado del check egreso a otra dependencia.
+      const opIng  = $tr.find('.chk-op-ing').is(':checked');  // Lee el estado del check ingreso de otra dependencia.
+      const opPend = $tr.find('.chk-op-pend').is(':checked'); // Lee el estado del check pendiente en reserva.
+
+      const pk  = $valor.data('pk') || $opj.data('pk');  // Obtiene la PK desde data-pk de cualquiera de los inputs.
+      if(!pk) return;                                    // Si no hay PK, omite esta fila.
+
+      const deltaRaw = $valor.val();                     // Lee el valor crudo del delta (puede ser vacío).
+      const deltaNum = (deltaRaw==='' || deltaRaw===null) ? 0 : parseInt(deltaRaw, 10); // Convierte delta a entero o 0.
+      const n_delta  = isNaN(deltaNum) ? 0 : deltaNum;   // Asegura que sea un número (si NaN, 0).
+
+      const opjRaw = $opj.val();                         // Lee el valor crudo de meta OPJ (puede ser vacío o null).
+      const opjNum = (opjRaw==='' || opjRaw===null) ? null : parseInt(opjRaw, 10); // Convierte a entero o null.
+      const n_opj  = (opjNum===null || isNaN(opjNum)) ? null : opjNum; // Valida que sea numérico, si no, deja null.
+
+      items.push({                                       // Agrega al arreglo el objeto con la información de la fila.
+        pk: pk,                                          // Identificador primario del registro a actualizar.
+        n_valor_modificado: n_delta,                     // Delta de valor agregado (puede ser 0).
+        n_meta_opj: n_opj,                               // Meta OPJ (puede ser null para no cambiar).
+        flags: {                                         // Flags booleanos que representan los switches marcados.
+          m_op_egre_otra_dep: opEgre,
+          m_op_ing_otra_dep:  opIng,
+          m_op_pend_reserva:  opPend,
+        }
+      });
+    });
+
+    if(!items.length){                                   // Si no se recolectó ninguna fila...
+      alert('No se encontraron filas.');                 // Muestra alerta al usuario.
+      $btn.prop('disabled', false).text('Guardar todo'); // Rehabilita el botón y restaura su texto.
+      return;                                            // Sale sin hacer la petición.
+    }
+
+    $.ajax({                                             // Inicia una petición AJAX para guardar los cambios masivos.
+      url: "{% url 'est:meta_resumen_guardar_bulk' %}",  // URL Django (named URL) que procesará el guardado.
+      method: "POST",                                    // Método HTTP POST.
+      data: JSON.stringify({items}),                     // Envia el payload con los ítems como JSON.
+      contentType: "application/json; charset=utf-8",    // Indica que el cuerpo es JSON.
+      headers: {"X-CSRFToken": csrftoken},               // Añade el token CSRF al header para seguridad.
+    }).done(function(resp){                              // Callback al completar con éxito la petición.
+      alert('Guardado masivo OK');                       // Notifica al usuario que todo salió bien.
+    }).fail(function(xhr){                               // Callback si la petición falla.
+      console.error(xhr.responseText);                   // Loguea el error en consola para debugging.
+      alert(xhr.responseJSON?.msg || 'Error al guardar');// Muestra mensaje de error amigable o el del backend.
+    }).always(function(){                                // Callback que siempre se ejecuta (éxito o error).
+      $btn.prop('disabled', false).text('Guardar todo'); // Rehabilita el botón y restaura el texto original.
+    });
+  });
+</script>
+{% endblock %}
+
+
+

@@ -1,91 +1,175 @@
 {% extends "base/base.html" %}
 {% load static %}
-<title>{% block title %} SARA :: Usuarios {% endblock %} </title>
 
-{% block nav %}
-<nav style="padding: 40px 10px; height: 70px;"
-    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-    id="layout-navbar">
-    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-        <i class="ti ti-menu-2 ti-md"></i>
-        </a>
-    </div>
+{% block title %} Control de Inicios de Sesión :: Estadistica {% endblock %}
+{% block title_nav %}Control de Inicios de Sesión{% endblock %}
 
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
-        <div class="navbar-nav align-items-center ">
-        <div class="nav-item navbar-search-wrapper mb-0">
-            <img
-            src="{% static "base/img/Icon/grafico_n.png" %}"
-            alt="user image"
-            class=" rounded p-3" width="75" height="70" />
-            
-        </div>
-        <h2 class="d-none d-md-inline-block font-weight-bold pt-4"></h2>
-        </div>
-
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-            <a
-                class="nav-link dropdown-toggle hide-arrow p-0"
-                href=""
-                data-bs-toggle="dropdown">
-                <div class="avatar avatar-online">
-                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
-                </div>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                <a class="dropdown-item mt-0" >
-                    <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-2">
-                        <div class="avatar avatar-online">
-                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
-                        </div>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
-                    </div>
-                    </div>
-                </a>
-                </li>
-                <li>
-                <div class="dropdown-divider my-1 mx-n2"></div>
-                </li>
-                <li>
-                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
-                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
-                </a>
-                </li>
-                <li>
-                <div class="d-grid px-2 pt-2 pb-1">
-                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
-                    <small class="align-middle">Cerrar Sesión</small>
-                    <i class="ti ti-logout ms-2 ti-14px"></i>
-                    </a>
-                </div>
-                </li>
-            </ul>
-        </li>
-        </ul>
-    </div>
-
-</nav>
+{% block grafico_css %}
+    <link rel="stylesheet" href="{% static 'base/vendor/apex-charts/apex-charts.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock  %}
 
-{% block body_container %}
+{% block select_css %}
+    <link rel="stylesheet" href="{% static 'base/vendor/bootstrap-select/bootstrap-select.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/select2/select2.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/form-validation/form-validation.css' %}" />
+{% endblock  %}
 
+{% block datatable_css %}
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+{% endblock  %}
+
+{% block date_range_css %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+{% endblock %}
+
+{% block body_container %}
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="row">
-        <div class="col-12">
+
+    <div class="row mt-2">
+        <!-- Upcoming Webinar -->
+        <div class="col-xxl-4 col-lg-6 col-md-6 col-md-6 col-12 mb-3">
+            <div class="card">
+                <div class="card-body pb-1">
+                    <div class="bg-label-dark rounded text-center mb-4 pt-4">
+                    <img
+                        class="img-fluid w-50"
+                        src="{% static "base/img/Icon/control_estadistico.png" %}"
+                        alt="Estadistico"/>
+                    </div>
+                    <h4 class="mb-2 font-weight-bold">Control de Inicios de Sesión</h4>
+                    <p> En esta pestaña, podras hacer seguimiento al ingreso de sesión de los usuarios  </p>
+                </div>
+            </div>
+        </div>
+        <!--/ Upcoming Webinar -->
+
+        <div class="col-xxl-5 col-lg-6 col-md-6 col-md-6 col-12 mb-3">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between">
+                    <div class="card-title mb-0">
+                        <h5 class="mb-1">Oficios creados esta Semana</h5>
+                    </div>
+                </div>
+
+                <div class="card-body pb-0">
+                    <div class="row align-items-center g-md-8">
+                        <div class="col-12 col-md-12 ps-xl-8">
+                            <div id="weeklyEarningReports"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-lg-12 col-md-12 col-md-12 col-12 mb-3">
+            <div class="row">
+                <div class="col-xxl-12 col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card mb-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div class="card-title mb-0">
+                                <h5 class="mb-0">Ingresos de HOY</h5>
+                            </div>
+                            <div class="card-icon">
+                               <h3 class="mb-1 me-2">{{ logueos_hoy }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-12 col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card mb-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div class="card-title mb-0">
+                                <h5 class="mb-0">Ingresos Totales</h5>
+                            </div>
+                            <div class="card-icon">
+                                <h3 class="mb-1 me-2">{{ total_logueos }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-12 col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card mb-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div class="card-title mb-0">
+                                <h5 class="mb-0">Ingresos del Mes</h5>
+                            </div>
+                            <div class="card-icon">
+                                <h3 class="mb-1 me-2">{{ logueos_mes }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-xxl-4 col-xl-5 col-lg-4 col-md-12 col-12 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <div class="card-title mb-0">
+                    <h5 class="m-0 me-2">Inicio Sesión</h5>
+                    </div>
+                    <input type="text" class="form-control w-50" id="searchInput" placeholder="Buscar usuario...">
+                </div>
+
+                <div class="px-5 py-4 border border-start-0 border-end-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                    <p class="mb-0 text-uppercase">Nombre de Usuario</p>
+                    <p class="mb-0 text-uppercase">Cantidad</p>
+                    </div>
+                </div>
+
+            <div class="card-body" id="loginsContainer">
+                {% for ingreso in ingresos %}
+                <div class="login-entry d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center">
+                    <div class="avatar avatar me-4">
+                        <img src="{% static 'base/img/Icon/user.png' %}" alt="Avatar" class="rounded-circle" />
+                    </div>
+                    <div>
+                        <h6 class="mb-0 text-truncate text-uppercase">{{ ingreso.usuario__x_app_paterno }} {{ ingreso.usuario__x_app_materno }}</h6>
+                        <small class="text-truncate text-body text-uppercase">{{ ingreso.usuario__x_nombres }}</small>
+                    </div>
+                    </div>
+                    <div class="text-end">
+                    <h6 class="mb-0">{{ ingreso.total_ingresos }}</h6>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            <div class="card-footer text-end">
+                <nav>
+                <ul class="pagination justify-content-end mb-0" id="pagination"></ul>
+                </nav>
+            </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-8 col-xl-7 col-lg-8 col-md-12 col-12 mb-3">
             {% comment %} ==========================================
             TABAL DE USUARIOS
             ======================================= {% endcomment %}
             <div class="row">
-                <div class="col-8">
-                    <div class="card mt-3">
-                        <div class="card-datatable table-responsive">
+                <div class="col-lg-12 col-12">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <div class="row mt-2">
+                                <label class="col-sm-3 col-form-label font-weight-bold" for="basic-default-name">Seleccionar Fecha:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="dateRange" class="form-control" placeholder="Filtrar por fechas..." autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
                             <table class="datatables-users table" id="tableListarUsuarios">
                                 <thead>
                                     <tr>
@@ -99,7 +183,7 @@
                                     {% for acceso in accesos %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td class="text-uppercase">{{ acceso.usuario.x_nombres }} {{ acceso.usuario.x_app_paterno }} {{ acceso.usuario.x_app_materno }}</td>
+                                            <td class="text-uppercase">{{ acceso.usuario.x_app_paterno }} {{ acceso.usuario.x_app_materno }} {{ acceso.usuario.x_nombres }}</td>
                                             <td>{{ acceso.f_fecha_hora|date:"d/m/Y H:i" }}</td>
                                             <td>{{ acceso.x_ip }}</td>
                                         </tr>
@@ -111,70 +195,213 @@
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
 
-                <div class="col-4">
-                    <div class="card mt-3">
-                        <div class="card-datatable table-responsive">
-                            <table class="datatables-users table" id="">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Usuario</th>
-                                        <th>Ingresos</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for ingreso in ingresos %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ ingreso.usuario__x_nombres }} {{ ingreso.usuario__x_app_paterno }}</td>
-                                        <td>{{ ingreso.total_ingresos }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+
             </div>
-
         </div>
+
     </div>
 </div>
 {% endblock %}
 
-{% block datatable %}
-<script>
-    $(document).ready(function () {
-        $('#tableListarUsuarios').DataTable({
-            "pageLength": 25,
-            "lengthMenu": [[25, 40, 50, 100, -1], [25, 40, 50, 100, "Todos"]],
-            autoWidth: false,
-            responsive: true,
-            "order": [[2, "desc"]],
-            language: {
-                "sProcessing": "Procesando...",
-                "sLengthMenu": "Mostrar _MENU_ registros",
-                "sZeroRecords": "No se encontraron resultados",
-                "sEmptyTable": "Ningún dato disponible en esta tabla",
-                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                "sSearch": "Buscar:",
-                "oPaginate": {
-                    "sFirst": "Primero",
-                    "sLast": "Último",
-                    "sNext": "Siguiente",
-                    "sPrevious": "Anterior"
-                },
-                "oAria": {
-                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                }
-            },
+{% block script %}
+    <script>
+
+        $(document).ready(function () {
+        var table = $('#tableListarUsuarios').DataTable();
+
+        // Date Range Picker
+        $('#dateRange').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Limpiar',
+                format: 'DD/MM/YYYY'
+            }
+        });
+
+        // Aplicar el filtro cuando se selecciona un rango
+        $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
+            var startDate = picker.startDate.startOf('day');
+            var endDate = picker.endDate.endOf('day');
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+
+            // Filtro personalizado por fecha
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var dateStr = data[2]; // columna "Fecha y Hora"
+                var date = moment(dateStr, "DD/MM/YYYY HH:mm");
+                return date.isBetween(startDate, endDate, null, '[]');
+            });
+
+            table.draw();
+        });
+
+        // Limpiar filtro
+        $('#dateRange').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $.fn.dataTable.ext.search.pop();
+            table.draw();
         });
     });
-</script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const entries = Array.from(document.querySelectorAll('.login-entry'));
+    const searchInput = document.getElementById('searchInput');
+    const pagination = document.getElementById('pagination');
+    const container = document.getElementById('loginsContainer');
+    const itemsPerPage = 9;
+    let currentPage = 1;
+
+    function renderList() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filtered = entries.filter(entry => {
+        const text = entry.textContent.toLowerCase();
+        return text.includes(searchTerm);
+        });
+
+        const totalPages = Math.ceil(filtered.length / itemsPerPage);
+        currentPage = Math.min(currentPage, totalPages) || 1;
+
+        container.innerHTML = '';
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+
+        filtered.slice(start, end).forEach(el => container.appendChild(el));
+
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = 'page-item' + (i === currentPage ? ' active' : '');
+        const btn = document.createElement('button');
+        btn.className = 'page-link';
+        btn.textContent = i;
+        btn.addEventListener('click', () => {
+            currentPage = i;
+            renderList();
+        });
+        li.appendChild(btn);
+        pagination.appendChild(li);
+        }
+    }
+
+    searchInput.addEventListener('input', renderList);
+    renderList();
+    });
+
+        const weeklyEarningReportsEl = document.querySelector('#weeklyEarningReports'),
+        
+        weeklyEarningReportsConfig = {
+        chart: {
+            height: 250,
+            type: 'bar',
+            toolbar: { show: false }
+        },
+        plotOptions: {
+            bar: {
+            borderRadius: 4,
+
+            }
+        },
+        colors: ['#707070', '#707070', '#707070', '#707070', '#707070', '#707070', '#707070'],
+        dataLabels: { enabled: false },
+        series: [{
+            name: 'Ingresos',
+            data: {{ conteo_dias|safe }}
+        }],
+        xaxis: {
+            categories: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            labels: {
+            style: {
+                colors: '#6E6B7B',
+                fontSize: '13px',
+                fontFamily: 'Public Sans'
+            }
+            }
+        },
+        yaxis: {
+            labels: { show: true }
+        },
+        tooltip: {
+            y: {
+            formatter: function (val) {
+                return `${val} ingresos`;
+            }
+            }
+        }
+        };
+
+        if (weeklyEarningReportsEl !== null) {
+            const chart = new ApexCharts(weeklyEarningReportsEl, weeklyEarningReportsConfig);
+            chart.render();
+        }
+    </script>
+
+{% endblock  %}
+
+{% block grafico_js %}
+    <script src="{% static 'base/vendor/apex-charts/apexcharts.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
+    <script src="{% static 'base/js/charts-chartjs.js' %}"></script>
+{% endblock %}
+
+{% block form_js %}
+    <script src="{% static 'base/vendor/bootstrap-select/bootstrap-select.js' %}"></script>
+    <script src="{% static 'base/vendor/select2/select2.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/popular.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/bootstrap5.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/auto-focus.js' %}"></script>
+{% endblock %}
+
+{% block datatable_js %}
+    <script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
+{% endblock %}
+
+{% block date_range_js %}
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+
+
+{% block datatable %}
+    <script>
+        $(document).ready(function () {
+            $('#tableListarUsuarios').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [[10, 40, 50, 100, -1], [25, 40, 50, 100, "Todos"]],
+                autoWidth: false,
+                responsive: true,
+                "order": [[0, "asc"]],
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sSearch": "Buscar:",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
+    </script>
 {% endblock  %}

@@ -3,9 +3,34 @@ from django.utils.timezone import localtime
 from django.utils.timezone import now
 from django.contrib.auth.models import AbstractUser, Group
 
-class mae_est_sexos(models.Model):
+class TablaControl(models.Model):
+    f_aud = models.DateTimeField(auto_now=True, null=True, blank=True)
+    b_aud = models.CharField(max_length=1, default='I', null=True)
+    c_aud_uid = models.CharField(max_length=30, null=True, blank=True)
+    c_aud_uidred = models.CharField(max_length=30, null=True, blank=True)
+    c_aud_pc = models.CharField(max_length=30, null=True, blank=True)
+    n_aud_ip = models.GenericIPAddressField(null=True, blank=True)
+    c_aud_mcaddr = models.CharField(max_length=17, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+class TablaAuditoria(models.Model):
+    n_trns_id = models.AutoField(primary_key=True)
+    f_trns = models.DateTimeField(auto_now_add=True)
+    b_trns = models.CharField(max_length=1)
+    c_trns_uid = models.CharField(max_length=30, null=True, blank=True)
+    c_trns_pc = models.CharField(max_length=30, null=True, blank=True)
+    n_trns_ip =  models.GenericIPAddressField(null=True, blank=True)
+    c_trns_mcaddr = models.CharField(max_length=17, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+class mae_est_sexos(TablaControl):
     n_id_sexo = models.AutoField(primary_key=True)
     x_descripcion = models.CharField(max_length=20)
+
 
     class Meta:
         db_table = 'mae_est_sexos'
@@ -21,7 +46,13 @@ class usuario(AbstractUser):
     x_telefono = models.CharField(max_length=15, blank=True, null=True)
     n_id_sexo = models.ForeignKey(mae_est_sexos, null=True, blank=True, on_delete=models.SET_NULL)
     profile_image = models.ImageField(upload_to='img_perfil/', default='img_perfil/perfil.png',blank=True,null=True)
-
+    l_mensaje = models.BooleanField(default=False)
+    f_aud = models.DateTimeField(auto_now=True, null=True, blank=True)
+    b_aud = models.CharField(max_length=1, default='I', null=True)
+    c_aud_uid = models.CharField(max_length=30, null=True, blank=True)
+    c_aud_uidred = models.CharField(max_length=30, null=True, blank=True)
+    n_aud_ip = models.GenericIPAddressField(null=True, blank=True)
+    c_aud_mcaddr = models.CharField(max_length=17, null=True, blank=True)
 
     groups = models.ManyToManyField(
         Group,
@@ -43,10 +74,11 @@ class usuario(AbstractUser):
     class Meta:
         db_table = 'mae_est_usuarios'
 
-class mae_est_usuarios_groups(models.Model):
+class mae_est_usuarios_groups(TablaControl):
     n_id_usuario_group = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(usuario, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    
 
     class Meta:
         db_table = 'mae_est_usuarios_groups'

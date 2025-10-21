@@ -1,77 +1,16 @@
 {% extends "base/base.html" %}
 {% load static %}
-<title>{% block title %} SARA :: Usuarios {% endblock %} </title>
+{% block title %} Usuarios :: Estadistica {% endblock %}
+{% block title_nav %} Usuarios Tablero {% endblock %}
 
-{% block nav %}
-<nav style="padding: 40px 10px; height: 70px;"
-    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-    id="layout-navbar">
-    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-        <i class="ti ti-menu-2 ti-md"></i>
-        </a>
-    </div>
+{% block alertas_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/sweetalert2/sweetalert2.css'%}" />
+{% endblock  %}
 
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
-        <div class="navbar-nav align-items-center ">
-        <div class="nav-item navbar-search-wrapper mb-0">
-            <img
-            src="{% static "base/img/Icon/grafico_n.png" %}"
-            alt="user image"
-            class=" rounded p-3" width="75" height="70" />
-            
-        </div>
-        <h2 class="d-none d-md-inline-block font-weight-bold pt-4"></h2>
-        </div>
-
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-            <a
-                class="nav-link dropdown-toggle hide-arrow p-0"
-                href=""
-                data-bs-toggle="dropdown">
-                <div class="avatar avatar-online">
-                <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
-                </div>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                <a class="dropdown-item mt-0" >
-                    <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-2">
-                        <div class="avatar avatar-online">
-                        <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
-                        </div>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
-                    </div>
-                    </div>
-                </a>
-                </li>
-                <li>
-                <div class="dropdown-divider my-1 mx-n2"></div>
-                </li>
-                <li>
-                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
-                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
-                </a>
-                </li>
-                <li>
-                <div class="d-grid px-2 pt-2 pb-1">
-                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
-                    <small class="align-middle">Cerrar Sesión</small>
-                    <i class="ti ti-logout ms-2 ti-14px"></i>
-                    </a>
-                </div>
-                </li>
-            </ul>
-        </li>
-        </ul>
-    </div>
-
-</nav>
+{% block datatable_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
 {% endblock  %}
 
 {% block body_container %}
@@ -136,52 +75,174 @@
     </div>
 </div>
 
+    <!-- OFFCANVAS: Formulario de Usuario -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
+  <div class="offcanvas-header">
+    <h5 id="offcanvasAddUserLabel" class="offcanvas-title">
+      {% if obj %} Editar Usuario {% else %} Agregar Usuario {% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <form method="post" enctype="multipart/form-data" id="formCrearUsuario">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-sm-12">
+          <label class="form-label">Apellido Paterno:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+            {{ form.x_app_paterno }}
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Apellido Materno:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+            {{ form.x_app_materno }}
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Nombres:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+            {{ form.x_nombres }}
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">DNI:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="fa-regular fa-address-card"></i></span>
+            {{ form.x_dni }}
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Sexo:</label>
+          {{ form.n_id_sexo }}
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Correo Electrónico:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="ti ti-mail"></i></span>
+            {{ form.email }}
+            <span class="input-group-text">@example.com</span>
+          </div>
+          <div class="form-text">Puedes ingresar números y letras</div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Imagen de Perfil:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="fa-regular fa-image"></i></span>
+            {{ form.profile_image }}
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Teléfono:</label>
+          <div class="input-group input-group-merge">
+            <span class="input-group-text"><i class="ti ti-phone"></i></span>
+            {{ form.x_telefono }}
+          </div>
+          <div class="form-text">Ej: 999888777 o +51 999888777</div>
+          <div class="invalid-feedback d-block" data-error-for="x_telefono"></div>
+        </div>
+        
+         <div class="col-sm-12">
+          <label class="form-label d-block">Mensajes / Notificaciones:</label>
+          <div class="form-check form-switch">
+            {{ form.l_mensaje }}
+            <label class="form-check-label ms-2">Permitir WhatsApp/SMS/Email</label>
+          </div>
+          <div class="invalid-feedback d-block" data-error-for="l_mensaje"></div>
+        </div>
+
+        <div class="col-sm-12">
+            <label class="form-label" for="first-name">Usuario:</label>
+            <div class="input-group input-group-merge">
+            <span id="basic-icon-default-fullname2" class="input-group-text"
+                ><i class="ti ti-user"></i
+            ></span>
+            {{form.username}}
+            </div>
+        </div>
+        
+        <div class="col-sm-12">
+            <label class="form-label" for="last-name">Contraseña:</label>
+            <div class="input-group input-group-merge">
+            <span id="basic-icon-default-fullname2" class="input-group-text"
+                ><i class="ti ti-user"></i
+            ></span>
+            {{form.password}}
+            </div>
+        </div>
+                            
+
+        <div class="col-12 mt-3 text-end">
+          <button type="submit" class="btn btn-success" id="btnGuardar">
+            <span id="btnText"><i class="fa-solid fa-check"></i> Guardar</span>
+            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+            </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
         <div class="col-12">
             <div class="row mt-2">
-                <div class="col-lg-6 mb-2">
+                <div class="col-xxl-6 col-xl-6 col-lg-6 mb-2">
                     <div class="card">
                         <div class="d-flex align-items-end row">
                             <div class="col-7">
                                 <div class="card-body text-nowrap">
                                     <h2 class="card-title mb-0 font-weight-bold">Listar Usuarios</h2>
                                     <p class="mb-2">Sistema de Estadistica / Listar Usuarios</p>
-                                    <a href="{% url "bases:user_new" %}"><button class="btn btn-success"><i class="fas fa-plus"></i> Agregar Usuario</button></a>
+                                    <button class="btn btn-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser">
+                                        <i class="fas fa-plus"></i> Agregar Usuario
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="col-5 text-center text-sm-left">
+                            <div class="col-5 text-center text-sm-left d-none d-md-block">
                                 <div class="card-body pb-0 px-0 px-md-4">
                                 <img
-                                    src="{% static "base/img/inicio.jpg" %}"
-                                    height="140"
-                                    alt="view sales"/>
+                                    src="{% static "base/img/Svg/list_usuarios.svg" %}"
+                                    class="img-fluid w-75"
+                                    alt="Lista de Usuarios"/>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-6 mb-2 col-xl-3">
+                <div class="col-xxl-3 col-xl-3 col-lg-3 mb-2">
                     <div class="card h-100">
                       <div class="card-body pt-5 mb-0 pb-0 text-center">
-                        <img width="50" src="{% static "base/img/Icon/femenino.png" %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" viewBox="0 0 384 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M80 176a112 112 0 1 1 224 0A112 112 0 1 1 80 176zM224 349.1c81.9-15 144-86.8 144-173.1C368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144 173.1l0 34.9-32 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 0 32c0 17.7 14.3 32 32 32s32-14.3 32-32l0-32 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-32 0 0-34.9z"/></svg>
                         <h5 class="mb-0 mt-3">Usuarios Femeninos</h5>
                         <h3 class="font-weight-bold card-title mb-0">{{ count_femenino }}</h3>
                       </div>
                     </div>
-                  </div>
+                </div>
 
-                <div class="col-sm-6 mb-2 col-xl-3">
+                <div class="col-xxl-3 col-xl-3 col-lg-3 mb-2">
                     <div class="card h-100">
                     <div class="card-body pt-5 mb-0 pb-0 text-center">
-                        <img width="50" src="{% static "base/img/Icon/masculino.png" %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="#000000" d="M289.8 46.8c3.7-9 12.5-14.8 22.2-14.8l112 0c13.3 0 24 10.7 24 24l0 112c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-33.4-33.4L321 204.2c19.5 28.4 31 62.7 31 99.8c0 97.2-78.8 176-176 176S0 401.2 0 304s78.8-176 176-176c37 0 71.4 11.4 99.8 31l52.6-52.6L295 73c-6.9-6.9-8.9-17.2-5.2-26.2zM400 80s0 0 0 0s0 0 0 0s0 0 0 0zM176 416a112 112 0 1 0 0-224 112 112 0 1 0 0 224z"/></svg>
                         <h5 class="mb-0 mt-3">Usuarios Masculinos</h5>
                         <h3 class="font-weight-bold card-title mb-0">{{ count_masculino }}</h3>
                       </div>
                     </div>
-                  </div>
+                </div>
             </div>
             {% comment %} ==========================================
             TABAL DE USUARIOS
@@ -207,10 +268,10 @@
                                 <td class="text-uppercase">{{ item.x_app_paterno }} {{ item.x_app_materno }} {{ item.x_nombres }}</td>
                                 <td class="text-uppercase text-center">{{ item.username }}</td>
                                 <td class="text-center">
-                                    {% if item.profile_image %}
+                                    {% if item.profile_image.url %}
                                     <img src="{{ item.profile_image.url }}" alt="Imagen de perfil" style="width: 50px; height: 50px; border-radius: 50%;">
                                     {% else %}
-                                    <img src="{{ item.profile_image.perfil.png }}" alt="Imagen de perfil por defecto" style="width: 50px; height: 50px; border-radius: 50%;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 50px; height: 50px; border-radius: 50%;" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
@@ -225,19 +286,23 @@
                                     <div class="btn-group">       
                                         {% if item.is_active %}       
                                             <a href="{% url 'bases:user_edit' item.pk %}" class="btn btn-info">
-                                                <i class="fas fa-edit"></i>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 512 512">
+                                                    <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
+                                                </svg>
                                             </a>
                                             <a href="{% url 'bases:user_pass_edit' item.pk %}" class="btn btn-dark">
-                                                <i class="fa-solid fa-key"></i>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 512 512">
+                                                    <path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17l0 80c0 13.3 10.7 24 24 24l80 0c13.3 0 24-10.7 24-24l0-40 40 0c13.3 0 24-10.7 24-24l0-40 40 0c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/>
+                                                </svg>
                                             </a>
 
                                             <button 
-                                                class="btn btn-primary" 
+                                                class="btn btn-warning" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#assignModal" 
                                                 data-url="{% url 'bases:user_asignar_modulos' item.id %}"
                                                 data-id="{{ item.id }}">
-                                                <i class="fas fa-layer-group"></i>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 576 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M264.5 5.2c14.9-6.9 32.1-6.9 47 0l218.6 101c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 149.8C37.4 145.8 32 137.3 32 128s5.4-17.9 13.9-21.8L264.5 5.2zM476.9 209.6l53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 277.8C37.4 273.8 32 265.3 32 256s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0l152-70.2zm-152 198.2l152-70.2 53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 405.8C37.4 401.8 32 393.3 32 384s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0z"/></svg>
                                             </button>
 
                                             <button 
@@ -245,11 +310,13 @@
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#deleteModal" 
                                                 data-id="{{ item.id }}">
-                                                <i class="fas fa-trash"></i>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 448 512">
+                                                    <path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/>
+                                                </svg>
                                             </button>
 
                                             <a href="{% url 'bases:generar_credenciales_pdf' item.id %}" class="btn btn-sm btn-success">
-                                                <i class="fas fa-file-pdf"></i>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 144-208 0c-35.3 0-64 28.7-64 64l0 144-48 0c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128zM176 352l32 0c30.9 0 56 25.1 56 56s-25.1 56-56 56l-16 0 0 32c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-48 0-80c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24l-16 0 0 48 16 0zm96-80l32 0c26.5 0 48 21.5 48 48l0 64c0 26.5-21.5 48-48 48l-32 0c-8.8 0-16-7.2-16-16l0-128c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16l0-64c0-8.8-7.2-16-16-16l-16 0 0 96 16 0zm80-112c0-8.8 7.2-16 16-16l48 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0 0 32 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0 0 48c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-64 0-64z"/></svg>
                                             </a>
                                         {% else %}
                                         <button 
@@ -257,7 +324,7 @@
                                             data-bs-toggle="modal" 
                                             data-bs-target="#addModal" 
                                             data-id="{{ item.id }}">
-                                            <i class="fas fa-check"></i>
+                                            
                                         </button>
                                         {% endif %}
                                     </div>
@@ -272,54 +339,6 @@
     </div>
 </div>
 {% endblock %}
-
-{% block datatable %}
-<script>
-    $(document).ready(function () {
-        $('#tableUsuario').DataTable({
-            "pageLength": 25,
-            "lengthMenu": [[25, 40, 50, 100, -1], [25, 40, 50, 100, "Todos"]],
-            autoWidth: false,
-            responsive: true,
-            dom: '<"row mb-3"<"col-md-3"l><"col-md-6 text-center"B><"col-md-3"f>>t<"row"<"col-md-6"i><"col-md-6"p>>',
-            buttons: [
-                {
-                    extend: 'collection',
-                    text: '<i class="fa fa-download"></i> Exportar Tabla',
-                    className: 'btn btn-danger mt-6',
-                    buttons: [
-                        { extend: 'print', text: '<i class="fa fa-print"></i> Imprimir' },
-                        { extend: 'csv', text: '<i class="fa fa-file-csv"></i> Archivo CSV' },
-                        { extend: 'excel', text: '<i class="fa fa-file-excel"></i> Archivo Excel' },
-                        { extend: 'pdf', text: '<i class="fa fa-file-pdf"></i> Archivo PDF' },
-                        { extend: 'copy', text: '<i class="fa fa-copy"></i> Copiar' }
-                    ]
-                }
-            ],
-            language: {
-                "sProcessing": "Procesando...",
-                "sLengthMenu": "Mostrar _MENU_ registros",
-                "sZeroRecords": "No se encontraron resultados",
-                "sEmptyTable": "Ningún dato disponible en esta tabla",
-                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                "sSearch": "Buscar:",
-                "oPaginate": {
-                    "sFirst": "Primero",
-                    "sLast": "Último",
-                    "sNext": "Siguiente",
-                    "sPrevious": "Anterior"
-                },
-                "oAria": {
-                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                }
-            },
-        });
-    });
-</script>
-{% endblock  %}
 
 {% block script %}
 <script>
@@ -435,5 +454,130 @@
             }
         });
     });
+
+    $('#formCrearUsuario').on('submit', function (e) {
+        e.preventDefault();
+        $('#btnGuardar').attr('disabled', true);
+        $('#btnText').addClass('d-none');
+        $('#btnSpinner').removeClass('d-none');
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "{% url 'bases:user_create' %}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    const table = $('#tableUsuario').DataTable();
+
+                    const fullName = `${response.x_app_paterno} ${response.x_app_materno} ${response.x_nombres}`.toUpperCase();
+                    const user = response.username.toUpperCase();
+                    const estado = response.is_active
+                        ? `<span class="text-success"><i class="fa-solid fa-circle-check"></i> ACTIVO </span>`
+                        : `<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> INACTIVO</span>`;
+
+                    const opciones = `
+                        <div class="btn-group">
+                            <a href="/ruta/a/editar/${response.id}/" class="btn btn-info">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/ruta/a/editar/pass/${response.id}/" class="btn btn-dark">
+                                <i class="fa-solid fa-key"></i>
+                            </a>
+                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#assignModal" data-id="${response.id}">
+                                <i class="fas fa-layer-group"></i>
+                            </button>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="${response.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <a href="/ruta/a/credenciales/pdf/${response.id}/" class="btn btn-sm btn-success">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                        </div>`;
+
+                    const newRow = table.row.add([
+                        `<td class="text-center">${response.id}</td>`,
+                        `<td class="text-uppercase text-center">${fullName}</td>`,
+                        `<td class="text-uppercase text-center">${user}</td>`,
+                        `<td class="text-center">
+                            <img src="${response.image_url}" style="width: 50px; height: 50px; border-radius: 50%;">
+                        </td>`,
+                        `<td class="text-center">${estado}</td>`,
+                        `<td class="text-center">${opciones}</td>`
+                    ]).draw('page').node();
+
+                    $(newRow).addClass('table-success');
+                }
+                $('#btnGuardar').attr('disabled', false);
+                $('#btnText').removeClass('d-none');
+                $('#btnSpinner').addClass('d-none');
+            },
+
+            error: function (xhr) {
+                $('#btnGuardar').attr('disabled', false);
+                $('#btnText').removeClass('d-none');
+                $('#btnSpinner').addClass('d-none');
+                const errors = xhr.responseJSON.errors;
+                let mensaje = '';
+                for (let campo in errors) {
+                    mensaje += `${campo}: ${errors[campo].join(', ')}\n`;
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al crear usuario',
+                    text: mensaje,
+                });
+            }
+        });
+    });
 </script>
 {% endblock %}
+
+    {% block alerts_js %}
+    <script src="{% static 'base/vendor/sweetalert2/sweetalert2.js' %}"></script>
+    {% endblock %}
+
+    {% block datatable_js %}
+    <script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
+    {% endblock %}
+
+    {% block datatable %}
+    <script>
+        $(document).ready(function(){
+            $('#tableUsuario').DataTable({
+                "pageLength": 15, // Muestra 25 filas por página al cargar
+                "lengthMenu": [ [15,30, 50, 100, -1], [15,30, 50, 100, "Todos"] ],
+                "order": [[0, "desc"]],
+                autoWidth: false,
+                responsive: true,
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
+    </script>
+    {% endblock  %}

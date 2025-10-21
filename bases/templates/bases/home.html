@@ -5,552 +5,64 @@
 INICIO :: CORTE DEL SANTA
 {% endblock  %}
 
-{% block nav %}
-<nav style="padding: 40px 10px; height: 70px;"
-    class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-    id="layout-navbar">
-    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-        <i class="ti ti-menu-2 ti-md"></i>
-        </a>
-    </div>
-
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
-        <div class="navbar-nav align-items-center ">
-        <div class="nav-item navbar-search-wrapper mb-0">
-            <img
-            src="{% static "base/img/Icon/grafico_n.png" %}"
-            alt="user image"
-            class=" rounded p-3" width="75" height="70" />
-            
-        </div>
-        <h2 class="d-none d-md-inline-block font-weight-bold pt-4">Sistema Estadistico <br></h2>
-        </div>
-
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-            <a
-                class="nav-link dropdown-toggle hide-arrow p-0"
-                href=""
-                data-bs-toggle="dropdown">
-                <div class="avatar avatar-online">
-                <img src="{{ user.profile_image.url }}" alt class="rounded-circle" />
-                </div>
-            </a>
-
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                <a class="dropdown-item mt-0" >
-                    <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-2">
-                        <div class="avatar avatar-online">
-                        <img src="{{ user.profile_image.url }}" alt="" class="rounded-circle" />
-                        </div>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
-                    </div>
-                    </div>
-                </a>
-                </li>
-                <li>
-                <div class="dropdown-divider my-1 mx-n2"></div>
-                </li>
-                <li>
-                <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
-                    <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
-                </a>
-                </li>
-                <li>
-                <div class="d-grid px-2 pt-2 pb-1">
-                    <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
-                    <small class="align-middle">Cerrar Sesión</small>
-                    <i class="ti ti-logout ms-2 ti-14px"></i>
-                    </a>
-                </div>
-                </li>
-            </ul>
-        </li>
-        </ul>
-    </div>
-
-    <!-- Search Small Screens -->
-    <div class="navbar-search-wrapper search-input-wrapper d-none">
-        <input
-        type="text"
-        class="form-control search-input container-xxl border-0"
-        placeholder="Search..."
-        aria-label="Search..." />
-        <i class="ti ti-x search-toggler cursor-pointer"></i>
-    </div>
-</nav>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/fonts/flag-icons.css' %}" />
+<link rel="stylesheet" href="{% static 'base/css/cards-advance.css' %}" />
 {% endblock  %}
 
 {% block body_container %}
-<style>
-  .porcentaje-marcador {
-    padding: 0; /* Elimina cualquier padding */
-    margin: 0 auto; /* Centra el texto si es necesario */
-    line-height: 1; /* Ajusta el espaciado vertical */
-    display: flex; /* Asegura que el elemento se comporte como un contenedor flexible */
-    align-items: center; /* Centra el contenido verticalmente */
-    justify-content: center; /* Centra el contenido horizontalmente */
+  <style>
+    .porcentaje-marcador {
+      padding: 0; /* Elimina cualquier padding */
+      margin: 0 auto; /* Centra el texto si es necesario */
+      line-height: 1; /* Ajusta el espaciado vertical */
+      display: flex; /* Asegura que el elemento se comporte como un contenedor flexible */
+      align-items: center; /* Centra el contenido verticalmente */
+      justify-content: center; /* Centra el contenido horizontalmente */
+    }
+
+    #grafico-media-luna {
+      margin: 0;
+      padding: 0;
+      display: flex; /* Opcional, asegura que el contenido se ajuste */
+      justify-content: center; /* Centra el contenido */
+      align-items: center; /* Centra el contenido */
   }
+  </style>
 
-  #grafico-media-luna {
-    margin: 0;
-    padding: 0;
-    display: flex; /* Opcional, asegura que el contenido se ajuste */
-    justify-content: center; /* Centra el contenido */
-    align-items: center; /* Centra el contenido */
-}
-</style>
+  <section class="content">
+      <div class="container-xxl flex-grow-1 container-p-y">
 
-<section class="content">
-    <div class="container-xxl flex-grow-1 container-p-y">
-
-      <div class="row mt-3"> 
-      {% comment %} PERFIL DE USUARIO INGRESADO ----- COLUMNA 4 {% endcomment %}
-      <div class="col-12 col-xl-4 col-md-6 mb-3">
-        <div class="card h-100">
-          <div class="card-body">
-
-              <img class="img-fluid rounded-circle mx-auto d-block" src="{{ user.profile_image.url }}" alt="Card girl image" width="160" />
-
-            <h5 class="mb-2 text-center">{{user.x_nombres}} {{user.x_app_paterno}} {{user.x_app_materno}}!</h5>
-            <p class="text-justify">
-              {% if perms.est.list_mae_est_modulos %}
-              Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control, que le permitirá monitorear el estado general de las operaciones. Hacer seguimiento detallado a las actividades de las Juzgados, y a las oficinas de Logística y Presupuesto, para asegurar un control eficiente y oportuno.
-              {% elif perms.est.list_mae_est_jueces %}
-              El Sistema estadistico, el cual analiza con las herramientas disponibles para obtener información de los indicadores y el nivel de productividad de los juzgados.
-              {% elif perms.est.list_mae_est_organo_jurisdiccionales %}
-              Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control. Podrá consultar las actividades de los Juzgados para asegurar un control eficiente y oportuno.
-              {% else %}
-              Bievenido al Sistema Estadistico
-              {% endif %}
-            </p>
-            <div class="row mb-4 g-3">
-              <div class="col-12">
-                <div class="d-flex align-items-center">
-                  <div class="avatar flex-shrink-0 me-3">
-                    <img src="{% static "base/img/Icon/reloj_n.png" %}">
-                  </div>
-                  <div>
-                    <h6 class="mb-0 text-nowrap">Ultima Actualización de Datos</h6>
-                    <small>{{ f_fecha_mod }}</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {% comment %} INFORMACIÓN DE LA CALIFICACIÓN {% endcomment %}
-      <div class="col-xxl-5 col-lg-5 mb-3">
-        <div class="card h-100">
-          <div class="card-header pb-0 mb-0 d-flex justify-content-between">
-            <div class="card-title mb-0">
-              <h5 class="pb-0 mb-0">Detalles de Semáforos Estadisticos</h5>
-            </div>
-          </div>
-          <div class="card-body p-0">
-            <div class="nav-align-top">
-              <ul class="nav nav-tabs nav-fill rounded-0 timeline-indicator-advanced" role="tablist">
-                <li class="nav-item">
-                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-new" aria-controls="navs-justified-new" aria-selected="true">Nivel Productividad</button>
-                </li>
-                <li class="nav-item">
-                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-link-preparing" aria-controls="navs-justified-link-preparing" aria-selected="false">IER</button>
-                </li>
-                <li class="nav-item">
-                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-link-shipping" aria-controls="navs-justified-link-shipping" aria-selected="false">Situacion de Carga</button>
-                </li>
-              </ul>
-
-              <div class="tab-content border-0  mx-1">
-                <div class="tab-pane fade show active" id="navs-justified-new" role="tabpanel">
-                  <ul class="timeline mb-0">
-                    <li class="timeline-item ps-6 ">
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-success bg-glow">MUY BUENO</span>
-                        </div>
-                        <h6 class="my-50">Si el nivel de productividad esta entre 88 a más</h6>
-                        <h6 class="my-50">Avance Real es igual o superior al Avance Anual.</h6>
-                      </div>
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-warning bg-glow">BUENO</span>
-                        </div>
-                        <h6 class="my-50">Si el nivel de productividad esta entre 75 y 87</h6>
-                        <h6 class="my-50">Avance Real es igual o superior al Avance Ideal del mes anterior e inferior al Avance Ideal.</h6>
-                      </div>
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-danger bg-glow">BAJO</span>
-                        </div>
-                        <h6 class="my-50">Si el nivel de productividad esta entre 0 y 74 Bajo</h6>
-                        <h6 class="my-50">Avance Real es inferior al avance ideal del mes anterior.</h6>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="tab-pane fade" id="navs-justified-link-preparing" role="tabpanel">
-                  <ul class="timeline mb-0">
-                    <li class="timeline-item ps-6 ">
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-success bg-glow">%</span>
-                        </div>
-                        <h6 class="my-50"><span class="font-weight-bold"> CRITERIO: </span> IER >= 90% </h6>
-                        <h6 class="my-50"><span class="font-weight-bold">INTERPRETACION: </span>La producción es al menos el 90% del volumen de expedientes ingresados a tramite.</h6>
-                      </div>
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-warning bg-glow">%</span>
-                        </div>
-                          <h6 class="my-50"><span class="font-weight-bold">CRITERIO: </span> 50% <= IER <= 90% </h6>
-                          <h6 class="my-50"><span class="font-weight-bold">INTERPRETACION: </span>El ingreso de expedientes a trámite es mayor a la producción pero no llega a ser el doble.</h6>
-                      </div>
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-danger bg-glow">%</span>
-                        </div>
-                          <h6 class="my-50"><span class="font-weight-bold">CRITERIO: </span>50% < 50% </h6>
-                          <h6 class="my-50"><span class="font-weight-bold">INTERPRETACION: </span> Se produce menos de la mitad de los expedientes que ingresan a trámite.</h6>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="tab-pane fade" id="navs-justified-link-shipping" role="tabpanel">
-                  <ul class="timeline mb-0">
-                    <li class="timeline-item ps-6 ">
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-success bg-glow">SUBCARGA</span>
-                        </div>
-                        <h6 class="my-50">Carga Procesal < Carga Procesal Minima Anual</h6>
-                        <h6 class="my-50">Meta Preliminar = 77% de la Carga Procesal Anual (*)</h6>
-                      </div>
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-warning bg-glow">ESTANDAR</span>
-                        </div>
-                        <h6 class="my-50">Carga Procesal Mínima Anual <= Carga procesal Anual <= Carga Procesal Máxima Anual</h6>
-                        <h6 class="my-50">Meta Preliminar = Estandar de Producción</h6>
-                      </div>
-
-                      <div class="timeline-event pt-0">
-                        <div class="timeline-header">
-                          <span class="badge bg-danger bg-glow">SOBRECARGA </span>
-                        </div>
-                        <h6 class="my-50">Carga Procesal Anual > Carga Procesal Máxima Anual</h6>
-                        <h6 class="my-50">Meta Preliminar = Estandar de Producción</h6>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {% comment %} INFORMACIÓN SEGÚN PERFIL {% endcomment %}
-      <div class="col-12 col-xl-3 col-md-6 mb-3">
-        <div class="row">
-          {% if perms.est.list_mae_est_modulos %}
-          <div class="col-lg-12 mb-3">
-            <div class="card card-border-shadow-dark h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-1">
-                  <div class="avatar me-4">
-                    <span class="avatar-initial rounded bg-label-dark"><i class="fas fa-building"></i></span>
-                  </div>
-                  <h4 class="mb-0">{{cantidad_instancias}}</h4>
-                </div>
-                <p class="mb-1">Instancias y/o Juzgados</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-lg-12 mb-3">
-            <div class="card card-border-shadow-dark h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-1">
-                  <div class="avatar me-4">
-                    <span class="avatar-initial rounded bg-label-dark"><i class="fas fa-gavel"></i></span>
-                  </div>
-                  <h4 class="mb-0">{{cantidad_jueces_activos}}</h4>
-                </div>
-                <p class="mb-1">Jueces Activos</p>
-              </div>
-            </div>
-          </div>
-          {% elif perms.est.list_mov_est_modulo_usuarios %}
-          <div class="col-lg-12 col-sm-6 mb-3">
-            <a href="{% url "est:estadistica_menu" %}">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/img/Icon/grafico_n.png" %}" class="img-fluid w-25 mx-auto d-block">
-                    <h5 class="mb-0 text-center">Estadística</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-lg-12 col-sm-6 mb-3">
-            <a href="{% url "est:power_estadistica" %}">
-                <div class="card card-border-shadow-dark h-100">
-                    <div class="card-body p-4">
-                        <img src="{% static "base/img/Icon/dashboard_n.png" %}" class="img-fluid w-25 mx-auto d-block">
-                        <h5 class="mb-0 text-center">Dashbord Estadistica</h5>
-                    </div>
-                </div>
-            </a>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-
-      {% if perms.est.list_mae_est_modulos %}
-        {% comment%} =============================================
-        PRESIDENTE - PANEL DE CONTROL
-        ========================================== {% endcomment %}
-        <div class="row mt-3">
-          <div class="col-lg-3 col-sm-6 mb-3">
-            <a href="{% url "est:estadistica_menu" %}">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/img/Icon/grafico_n.png" %}" class="img-fluid w-25 mx-auto d-block">
-                    <h5 class="mb-0 text-center">Estadística</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 mb-3">
-            <a href="{% url "est:logistica_menu" %}">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/Img/Icon/logistica_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
-                    <h5 class="mb-0 text-center">Logística</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 mb-3">
-            <a href="{% url "est:presupuesto_menu" %}">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/Img/Icon/presupuesto_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
-                    <h5 class="mb-0 text-center">Presupuesto</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 mb-3">
-            <a href="{% url "est:depositos_menu" %}">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/Img/Icon/deposito_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
-                  <h5 class="mb-0 text-center">Depósitos</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 mb-3">
-            <a href="C:\Program Files (x86)\iVMS-4200 Site\iVMS-4200 Client\Server>iVMS-4200.Framework.S.exe">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/img/Icon/camara_black.png" %}" class="img-fluid w-25 mx-auto d-block">
-                    <h5 class="mb-0 text-center">Cámaras</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 mb-3">
-            <a href="{% url "est:power_sinoe" %}">
-              <div class="card card-border-shadow-dark h-100">
-                <div class="card-body p-4">
-                  <img src="{% static "base/img/Icon/notificacion_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
-                    <h5 class="mb-0 text-center">Sinoe</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-
-
-        </div>
-      {% endif %}
-
-      {% if perms.est.list_mae_est_jueces %}
-        {% comment%} =============================================
-        INFORMACIÓN DE JUEZ
-        ========================================== {% endcomment %}
         <div class="row mt-3"> 
+        {% comment %} PERFIL DE USUARIO INGRESADO ----- COLUMNA 4 {% endcomment %}
+        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-6 col-12 mb-3">
+          <div class="card h-100">
+            <div class="card-body">
 
-          {% if resumenes %}
-          {% for resumen in resumenes %}
-              <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                <div class="card mb-4 shadow">
-                  <div class="card-body pb-0">
-                      <h5 class="card-title">{{ resumen.instancia }}</h5>
-                      <div class="porcentaje-marcador" style="padding:0px;margin:0px" id="grafico-media-luna"></div>
-                      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                        <div style="font-size: 30px; font-weight: bold;">{{ avance_meta|floatformat:2 }}%</div>
-                        <div style="font-size: 20px; color: #666;">Avance de Meta</div>
+                <img class="img-fluid rounded-circle mx-auto d-block" src="{{ user.profile_image.url }}" alt="Card girl image" width="160" />
+
+              <h5 class="mb-2 text-center">{{user.x_nombres}} {{user.x_app_paterno}} {{user.x_app_materno}}!</h5>
+              <p class="text-justify">
+                {% if perms.est.list_mae_est_modulos %}
+                Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control, que le permitirá monitorear el estado general de las operaciones. Hacer seguimiento detallado a las actividades de las Juzgados, y a las oficinas de Logística y Presupuesto, para asegurar un control eficiente y oportuno.
+                {% elif perms.est.list_mae_est_jueces %}
+                El Sistema estadistico, el cual analiza con las herramientas disponibles para obtener información de los indicadores y el nivel de productividad de los juzgados.
+                {% elif perms.est.list_mae_est_organo_jurisdiccionales %}
+                Bienvenido al sistema Estadistico de la Corte Superior de Justicia del Santa, aquí podrá visualizar el Tablero de Control. Podrá consultar las actividades de los Juzgados para asegurar un control eficiente y oportuno.
+                {% else %}
+                Bievenido al Sistema Estadistico
+                {% endif %}
+              </p>
+              <div class="row mb-4 g-3">
+                <div class="col-12">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar flex-shrink-0 me-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/></svg>
                     </div>
-                    <h5 class="text-center mt-0 pt-0">Porcentaje de Meta Ideal: {{resumen.ideal_meta}}% </h5>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-xl-8 col-lg-6 col-md-6 col-sm-12">
-                <div class="row">
-                  <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
-                    <div class="card {% if resumen.nivel_produc == "MUY BUENO" %}card-border-shadow-success{% elif resumen.nivel_produc == 'BUENO' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
-                      <div class="d-flex align-items-center row">
-                        <div class="col-7 text-center">
-                            <div class="card-body mt-0 text-nowrap">
-                                <h5 class="card-title mb-0 mt-0 text-dark font-weight-bold">NIVEL DE PRODUCTIVIDAD</h5>
-                                <h4 class="mb-0 pb-1">
-                                    <span class="badge 
-                                        {% if resumen.nivel_produc == "MUY BUENO" %}bg-success
-                                        {% elif resumen.nivel_produc == 'BUENO' %}bg-warning text-dark
-                                        {% else %}bg-danger{% endif %}">
-                                        {{ resumen.nivel_produc }}
-                                      </span>
-                                    </h4>
-                                    <a data-bs-toggle="modal"
-                                    data-bs-target="#modalProductividad" class="mt-0 pt-2">Más Información</a>
-                            </div>
-                        </div>
-                        
-                        <div class="col-5 d-flex align-items-start">
-                            <div class="card-body d-flex align-items-start pt-0 mt-0">
-                              {% if resumen.nivel_produc == "MUY BUENO" %}
-                                <img src="{% static "base/img/Svg/medalla.svg" %}" height="140" alt="medalla">
-                              {% elif resumen.nivel_produc == "BUENO" %}
-                                <img src="{% static "base/img/Svg/medalla_plata.svg" %}" height="140" alt="medalla">
-                              {% else %}
-                                <img src="{% static "base/img/Svg/medalla_bronce.svg" %}" height="140" alt="medalla">
-                                {% endif %}
-                                
-                            </div>
-                        </div>
-                      </div>
+                    <div>
+                      <h6 class="mb-0 text-nowrap">Ultima Actualización de Datos</h6>
+                      <small>{{ f_fecha_mod }}</small>
                     </div>
-                  </div>
-
-                  <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
-                    <div class="card {% if resumen.IER >= 90 %}card-border-shadow-success{% elif resumen.IER >= 50 %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
-                      <div class="d-flex align-items-center row">
-                        <div class="col-7 text-center">
-                            <h5 class="mb-0 mt-0 text-center text-dark font-weight-bold">Indicador de Exp. Resueltos (IER)</h5>
-                            <h4 class="mb-0 pb-1">
-                              <span class="badge 
-                                  {% if resumen.IER >= 90 %}bg-success
-                                  {% elif resumen.IER >= 50 %}bg-warning text-dark
-                                  {% else %}bg-danger{% endif %}">
-                                  {{ resumen.IER }}%
-                              </span>
-                            </h4>
-                            <a data-bs-toggle="modal"
-                            data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
-                        </div>
-      
-                        <div class="col-5 d-flex align-items-center justify-content-center">
-                          <div class="card-body d-flex align-items-start pt-0 mt-0">
-                            {% if resumen.IER >= 90 %}
-                              <img src="{% static "base/img/Svg/subcarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
-                            {% elif resumen.IER >= 50 %}
-                              <img src="{% static "base/img/Svg/estandar.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
-                            {% else %}
-                              <img src="{% static "base/img/Svg/sobrecarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
-                              {% endif %}
-                          </div>
-                        </div>
-                      </div>
-                    
-                    </div>
-                  </div>
-
-                  <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
-                    <div class="card {% if resumen.situacion_carga == "SUBCARGA" %}card-border-shadow-success{% elif resumen.situacion_carga == 'ESTANDAR' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
-                      <div class="row  d-flex align-items-center">
-                        <div class="col-7 text-center">
-                            <h5 class="mb-0 mt-0 text-center text-dark font-weight-bold">SITUACIÓN DE CARGA EN TRÁMITE</h5>
-                            <h4 class="mb-0 pb-1">
-                              <span class="badge 
-                                  {% if resumen.situacion_carga == "SUBCARGA" %}bg-success
-                                  {% elif resumen.situacion_carga == 'ESTANDAR' %}bg-warning text-dark
-                                  {% else %}bg-danger{% endif %}">
-                                  {{ resumen.situacion_carga }}
-                              </span>
-                            </h4>
-                            <a data-bs-toggle="modal"
-                            data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
-                        </div>
-      
-                        <div class="col-5 d-flex align-items-center justify-content-center">
-                          <div class="card-body d-flex align-items-start pt-0 mt-0">
-                            {% if resumen.situacion_carga == "SUBCARGA" %}
-                              <img src="{% static "base/img/Svg/verde_subcarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
-                            {% elif resumen.situacion_carga == "ESTANDAR" %}
-                              <img src="{% static "base/img/Svg/ama_estandar.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
-                            {% else %}
-                              <img src="{% static "base/img/Svg/rojo_sobrecarga.svg" %}" height="140" alt="medalla" class="pt-3 pb-3">
-                              {% endif %}
-                          </div>
-                        </div>
-                      </div>
-                    
-                    </div>
-                  </div>
-                </div>
-              </div>
-          {% endfor %}
-      {% else %}
-          <p class="text-muted">No hay datos disponibles para el día anterior.</p>
-      {% endif %}
-        </div>
-
-        <div class="modal fade" id="modalProductividad" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="modalCenterTitle">Información Nivel de Productividad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-
-              <div class="modal-body">
-                <div class="row">
-                  <div class="col-12 mb-2">
-                    <button type="button" class="btn rounded-pill btn-danger">BAJO</button> Si el nivel de productividad esta entre 0 y 74 Bajo 
-                  </div>
-
-                  <div class="col-12 mb-2">
-                    <button type="button" class="btn rounded-pill btn-warning">BUENO</button> Si el nivel de productividad esta entre 75 y 87 
-                  </div>
-
-                  <div class="col-12">
-                    <button type="button" class="btn rounded-pill btn-success">MUY BUENO</button> Si el nivel de productividad esta entre 88 a más
                   </div>
                 </div>
               </div>
@@ -558,56 +70,382 @@ INICIO :: CORTE DEL SANTA
           </div>
         </div>
 
-        <div class="modal fade" id="modalEstandar" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content ">
-              <div class="modal-header">
-                <h5 class="modal-title" id="modalCenterTitle">Información Nivel de Productividad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        {% comment %} INFORMACIÓN DE LA CALIFICACIÓN {% endcomment %}
+        <div class="col-xxl-8 col-lg-8 col-md-6 col-sm-6 col-12 mb-3">
+          <div class="card h-100">
+            <div class="card-header pb-0 mb-0 d-flex justify-content-between">
+              <div class="card-title mb-0">
+                <h5 class="pb-0 mb-0">Detalles de Semáforos Estadisticos</h5>
               </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="nav-align-top">
+                <ul class="nav nav-tabs nav-fill rounded-0 timeline-indicator-advanced" role="tablist">
+                  <li class="nav-item">
+                    <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-new" aria-controls="navs-justified-new" aria-selected="true">Nivel Productividad</button>
+                  </li>
+                  <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-link-preparing" aria-controls="navs-justified-link-preparing" aria-selected="false">IER</button>
+                  </li>
+                  <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-justified-link-shipping" aria-controls="navs-justified-link-shipping" aria-selected="false">Situacion de Carga</button>
+                  </li>
+                </ul>
 
-              <div class="modal-body">
-                <div class="row">
-                  <div class="col-12 mb-2">
-                    <table class="table table-bordered">
-                      <thead>
-                        <th>Condición</th>
-                        <th>Observación</th>
-                        <th>Situación</th>
-                      </thead>
+                <div class="tab-content border-0  mx-1">
+                  <div class="tab-pane fade show active" id="navs-justified-new" role="tabpanel">
+                    <div class="row">
+                      <div class="col-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="img-fluid mx-auto d-block" width="100" viewBox="0 0 512 512">
+                          <path fill="green" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+                        </svg>
+                        <h5 class="d-flex justify-content-center mt-2"><span class="text cemter badge bg-success bg-glow">MUY BUENO</span></h5>
+                        <p class="text-justify">Si el nivel de productividad esta entre 88 a más</p>
+                        <p class="text-justify">Avance Real es igual o superior al Avance Anual.</p>
+                      </div>
 
-                      <tbody>
-                        <tr>
-                          <td>Carga Procesal < Carga Procesal Minima Anual</td>
-                          <td>Meta Preliminar = 77% de la Carga Procesal Anual (*)</td>
-                          <td><button type="button" class="btn rounded-pill btn-success">SUBCARGA</button></td>
-                        </tr>
+                      <div class="col-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="img-fluid mx-auto d-block" width="100" viewBox="0 0 512 512">
+                          <path fill="#FFC107" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM184 232l144 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-144 0c-13.3 0-24-10.7-24-24s10.7-24 24-24z"/>
+                        </svg>
+                        <h5 class="d-flex justify-content-center mt-2"><span class="text cemter badge bg-warning bg-glow">BUENO</span></h5>
+                          <p class="text-justify">Si el nivel de productividad esta entre 75 y 87</p>
+                          <p class="text-justify">Avance Real es igual o superior al Avance Ideal del mes anterior e inferior al Avance Ideal.</p>
+                      </div>
 
-                        <tr>
-                          <td>Carga Procesal Mínima Anual <= Carga procesal Anual <= Carga Procesal Máxima Anual</td>
-                          <td>Meta Preliminar = Estandar de Producción</td>
-                          <td><button type="button" class="btn rounded-pill btn-warning">ESTANDAR</button></td>
-                        </tr>
+                      <div class="col-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="img-fluid mx-auto d-block" width="100" viewBox="0 0 512 512">
+                            <path fill="#DC3545" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
+                          </svg>
+                        <h5 class="d-flex justify-content-center mt-2"><span class="text cemter badge bg-danger bg-glow">BAJO</span></h5>
+                        <p class="text-justify">Si el nivel de productividad esta entre 0 y 74 Bajo</p>
+                        <p class="text-justify">Avance Real es inferior al avance ideal del mes anterior.</p>
+                      </div>
+                    </div>
+                  </div>
 
-                        <tr>
-                          <td>Carga Procesal Anual > Carga Procesal Máxima Anual</td>
-                          <td>Meta Preliminar = Estandar de Producción</td>
-                          <td><button type="button" class="btn rounded-pill btn-danger">SOBRECARGA</button></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="tab-pane fade" id="navs-justified-link-preparing" role="tabpanel">
+                    <div class="row">
+                      <div class="col-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="img-fluid mx-auto d-block" width="100" height="100"
+                            viewBox="0 0 24 24" fill="#28A745"
+                            class="icon icon-tabler icons-tabler-filled icon-tabler-circle-percentage">
+                          <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -20 0l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72m3 12.12a1 1 0 0 0 -1 1v.015a1 1 0 0 0 2 0v-.015a1 1 0 0 0 -1 -1m.707 -5.752a1 1 0 0 0 -1.414 0l-6 6a1 1 0 0 0 1.414 1.414l6 -6a1 1 0 0 0 0 -1.414m-6.707 -.263a1 1 0 0 0 -1 1v.015a1 1 0 1 0 2 0v-.015a1 1 0 0 0 -1 -1" />
+                        </svg>
+                        <h5 class="d-flex justify-content-center mt-2"><span class="text cemter badge bg-success bg-glow">MUY BUENO</span></h5>
+                          <p class="my-50"><span class="font-weight-bold"> CRITERIO: </span> IER >= 90% </p>
+                          <p class="my-50"><span class="font-weight-bold">INTERPRETACION: </span>La producción es al menos el 90% del volumen de expedientes ingresados a tramite.</p>
+                      </div>
+
+                      <div class="col-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="img-fluid mx-auto d-block" width="100" height="100"
+                            viewBox="0 0 24 24" fill="#FFC107"
+                            class="icon icon-tabler icons-tabler-filled icon-tabler-circle-percentage">
+                          <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -20 0l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72m3 12.12a1 1 0 0 0 -1 1v.015a1 1 0 0 0 2 0v-.015a1 1 0 0 0 -1 -1m.707 -5.752a1 1 0 0 0 -1.414 0l-6 6a1 1 0 0 0 1.414 1.414l6 -6a1 1 0 0 0 0 -1.414m-6.707 -.263a1 1 0 0 0 -1 1v.015a1 1 0 1 0 2 0v-.015a1 1 0 0 0 -1 -1" />
+                        </svg>
+                        <h5 class="d-flex justify-content-center mt-2"><span class="text cemter badge bg-warning bg-glow">BUENO</span></h5>
+                          <p class="my-50"><span class="font-weight-bold">CRITERIO: </span> 50% <= IER <= 90% </p>
+                          <p class="my-50"><span class="font-weight-bold">INTERPRETACION: </span>El ingreso de expedientes a trámite es mayor a la producción pero no llega a ser el doble.</p>
+                      </div>
+
+                      <div class="col-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="img-fluid mx-auto d-block" width="100" height="100"
+                            viewBox="0 0 24 24" fill="#DC3545"
+                            class="icon icon-tabler icons-tabler-filled icon-tabler-circle-percentage">
+                          <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -20 0l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72m3 12.12a1 1 0 0 0 -1 1v.015a1 1 0 0 0 2 0v-.015a1 1 0 0 0 -1 -1m.707 -5.752a1 1 0 0 0 -1.414 0l-6 6a1 1 0 0 0 1.414 1.414l6 -6a1 1 0 0 0 0 -1.414m-6.707 -.263a1 1 0 0 0 -1 1v.015a1 1 0 1 0 2 0v-.015a1 1 0 0 0 -1 -1" />
+                        </svg>
+                        <h5 class="d-flex justify-content-center mt-2"><span class="text cemter badge bg-danger bg-glow">BAJO</span></h5>
+                          <p class="my-50"><span class="font-weight-bold">CRITERIO: </span>50% < 50% </p>
+                          <p class="my-50"><span class="font-weight-bold">INTERPRETACION: </span> Se produce menos de la mitad de los expedientes que ingresan a trámite.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="tab-pane fade" id="navs-justified-link-shipping" role="tabpanel">
+                    <ul class="timeline mb-0">
+                      <li class="timeline-item ps-6 ">
+
+                        <div class="timeline-event pt-0">
+                          <div class="timeline-header">
+                            <span class="badge bg-success bg-glow">SUBCARGA</span>
+                          </div>
+                          <h6 class="my-50">Carga Procesal < Carga Procesal Minima Anual</h6>
+                          <h6 class="my-50">Meta Preliminar = 77% de la Carga Procesal Anual (*)</h6>
+                        </div>
+
+                        <div class="timeline-event pt-0">
+                          <div class="timeline-header">
+                            <span class="badge bg-warning bg-glow">ESTANDAR</span>
+                          </div>
+                          <h6 class="my-50">Carga Procesal Mínima Anual <= Carga procesal Anual <= Carga Procesal Máxima Anual</h6>
+                          <h6 class="my-50">Meta Preliminar = Estandar de Producción</h6>
+                        </div>
+
+                        <div class="timeline-event pt-0">
+                          <div class="timeline-header">
+                            <span class="badge bg-danger bg-glow">SOBRECARGA </span>
+                          </div>
+                          <h6 class="my-50">Carga Procesal Anual > Carga Procesal Máxima Anual</h6>
+                          <h6 class="my-50">Meta Preliminar = Estandar de Producción</h6>
+                        </div>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      {% endif %}
-</section>
-{% endblock  %}
 
-{% block datatable %}
-{% endblock  %}
+        {% if perms.est.list_mae_est_modulos %}
+          {% comment%} =============================================
+          PRESIDENTE - PANEL DE CONTROL
+          ========================================== {% endcomment %}
+          <div class="row mt-3">
+            <div class="col-lg-3 col-sm-6 mb-3">
+              <a href="{% url "est:estadistica_menu" %}">
+                <div class="card card-border-shadow-dark h-100">
+                  <div class="card-body p-4">
+                    <img src="{% static "base/img/Icon/grafico_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                      <h5 class="mb-0 text-center">Estadística</h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+              <a href="{% url "est:logistica_menu" %}">
+                <div class="card card-border-shadow-dark h-100">
+                  <div class="card-body p-4">
+                    <img src="{% static "base/Img/Icon/logistica_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                      <h5 class="mb-0 text-center">Logística</h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+              <a href="{% url "est:presupuesto_menu" %}">
+                <div class="card card-border-shadow-dark h-100">
+                  <div class="card-body p-4">
+                    <img src="{% static "base/Img/Icon/presupuesto_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                      <h5 class="mb-0 text-center">Presupuesto</h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+              <a href="{% url "est:depositos_menu" %}">
+                <div class="card card-border-shadow-dark h-100">
+                  <div class="card-body p-4">
+                    <img src="{% static "base/Img/Icon/deposito_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                    <h5 class="mb-0 text-center">Depósitos</h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+              <a href="C:\Program Files (x86)\iVMS-4200 Site\iVMS-4200 Client\Server>iVMS-4200.Framework.S.exe">
+                <div class="card card-border-shadow-dark h-100">
+                  <div class="card-body p-4">
+                    <img src="{% static "base/img/Icon/camara_black.png" %}" class="img-fluid w-25 mx-auto d-block">
+                      <h5 class="mb-0 text-center">Cámaras</h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+              <a href="{% url "est:power_sinoe" %}">
+                <div class="card card-border-shadow-dark h-100">
+                  <div class="card-body p-4">
+                    <img src="{% static "base/img/Icon/notificacion_gris.png" %}" class="img-fluid w-25 mx-auto d-block">
+                      <h5 class="mb-0 text-center">Sinoe</h5>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        {% endif %}
+
+        {% if perms.est.list_mae_est_jueces %}
+          {% comment%} =============================================
+          INFORMACIÓN DE JUEZ
+          ========================================== {% endcomment %}
+          <div class="row mt-3"> 
+
+            {% if resumenes %}
+              {% for resumen in resumenes %}
+                  <div class="col-xl-4 col-lg-6 col-md-12 col-12 mb-3">
+                      <div class="card {% if resumen.nivel_produc == "MUY BUENO" %}card-border-shadow-success{% elif resumen.nivel_produc == 'BUENO' %}card-border-shadow-warning{% else %}card-border-shadow-danger{% endif %}">
+                          <div class="d-flex align-items-center row">
+                              <div class="col-12 text-center">
+                                  <div class="card-body mt-0 text-nowrap">
+                                      <div class="bg-label-dark rounded text-center mb-4 pt-4">
+                                          {% if resumen.nivel_produc == "MUY BUENO" %}
+                                          <img src="{% static "base/img/images/medalla_oro.png" %}" alt="Card girl image" class="img-fluid w-75" />
+                                          {% elif resumen.nivel_produc == "BUENO" %}
+                                          <img src="{% static "base/img/images/medalla_plata.png" %}" alt="Card girl image" class="img-fluid w-75" />
+                                          {% else %}
+                                          <img src="{% static "base/img/images/medalla_bronce.png" %}" alt="Card girl image" class="img-fluid w-75" />
+                                          {% endif %}
+                                      </div>
+                                      <h5 class="mb-2"><span class="font-weight-bold">NIVEL DE PRODUCTIVIDAD</span> <br> {{resumen.instancia}}</h5>
+                                      <h4 class="mb-0 pb-1">
+                                      <span class="badge
+                                              {% if resumen.nivel_produc == "MUY BUENO" %}bg-success
+                                              {% elif resumen.nivel_produc == 'BUENO' %}bg-warning text-dark
+                                              {% else %}bg-danger{% endif %}">
+                                              {{ resumen.nivel_produc }}
+                                              </span>
+                                      </h4>
+                                  </div>
+                              </div>
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="col-xl-8 col-lg-6 col-md-6 col-sm-12">
+                    <div class="row">
+                      <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
+                        <div class="card h-100">
+                          <div class="card-header text-center pb-1">
+                            <h4 class="font-weight-bold mb-1">Indicador de Expedientes Resueltos (IER)</h4>
+                          </div>
+                          <div class="card-body text-center">
+                              {% if resumen.IER >= 90 %}
+                                  <img src="{% static 'base/img/Svg/subcarga.svg' %}" height="140" alt="medalla" class="pb-3">
+                                {% elif resumen.IER >= 50 %}
+                                  <img src="{% static 'base/img/Svg/estandar.svg' %}" height="140" alt="medalla" class="pb-3">
+                                {% else %}
+                                  <img src="{% static 'base/img/Svg/sobrecarga.svg' %}" height="140" alt="medalla" class="pb-3">
+                              {% endif %}
+                            <h4><span class="badge 
+                              {% if resumen.IER >= 90 %}bg-success
+                              {% elif resumen.IER >= 50 %}bg-warning text-dark
+                              {% else %}bg-danger{% endif %}">
+                              {{ resumen.IER }}%
+                            </span></h4>
+                            <a data-bs-toggle="modal"
+                                data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-xl-6 col-lg-12 col-md-12 col-12 mb-3">
+                        <div class="card h-100">
+                          <div class="card-header pb-1 text-center">
+                            <h4 class="font-weight-bold mb-1">Situación <br> Carga de Trámite</h4>
+                          </div>
+                          <div class="card-body text-center">
+                            
+                                {% if resumen.situacion_carga == "SUBCARGA" %}
+                                  <img src="{% static "base/img/Svg/verde_subcarga.svg" %}" height="140" alt="medalla" class="pb-3">
+                                {% elif resumen.situacion_carga == "ESTANDAR" %}
+                                  <img src="{% static "base/img/Svg/ama_estandar.svg" %}" height="140" alt="medalla" class="pb-3">
+                                {% else %}
+                                  <img src="{% static "base/img/Svg/rojo_sobrecarga.svg" %}" height="140" alt="medalla" class="pb-3">
+                                  {% endif %}
+                            <h4>
+                              <span class="badge 
+                                {% if resumen.situacion_carga == "SUBCARGA" %}bg-success
+                                {% elif resumen.situacion_carga == 'ESTANDAR' %}bg-warning text-dark
+                                {% else %}bg-danger{% endif %}">
+                                {{ resumen.situacion_carga }}
+                              </span>
+                            </h4>
+                            <a data-bs-toggle="modal"
+                                data-bs-target="#modalEstandar" class="mt-0 pt-2 text-center">Más Información</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              {% endfor %}
+            {% else %}
+            <p class="text-muted">No hay datos disponibles para el día anterior.</p>
+            {% endif %}
+          </div>
+
+          <div class="modal fade" id="modalProductividad" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalCenterTitle">Información Nivel de Productividad</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-12 mb-2">
+                      <button type="button" class="btn rounded-pill btn-danger">BAJO</button> Si el nivel de productividad esta entre 0 y 74 Bajo 
+                    </div>
+
+                    <div class="col-12 mb-2">
+                      <button type="button" class="btn rounded-pill btn-warning">BUENO</button> Si el nivel de productividad esta entre 75 y 87 
+                    </div>
+
+                    <div class="col-12">
+                      <button type="button" class="btn rounded-pill btn-success">MUY BUENO</button> Si el nivel de productividad esta entre 88 a más
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal fade" id="modalEstandar" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content ">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalCenterTitle">Información Nivel de Productividad</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-12 mb-2">
+                      <table class="table table-bordered">
+                        <thead>
+                          <th>Condición</th>
+                          <th>Observación</th>
+                          <th>Situación</th>
+                        </thead>
+
+                        <tbody>
+                          <tr>
+                            <td>Carga Procesal < Carga Procesal Minima Anual</td>
+                            <td>Meta Preliminar = 77% de la Carga Procesal Anual (*)</td>
+                            <td><button type="button" class="btn rounded-pill btn-success">SUBCARGA</button></td>
+                          </tr>
+
+                          <tr>
+                            <td>Carga Procesal Mínima Anual <= Carga procesal Anual <= Carga Procesal Máxima Anual</td>
+                            <td>Meta Preliminar = Estandar de Producción</td>
+                            <td><button type="button" class="btn rounded-pill btn-warning">ESTANDAR</button></td>
+                          </tr>
+
+                          <tr>
+                            <td>Carga Procesal Anual > Carga Procesal Máxima Anual</td>
+                            <td>Meta Preliminar = Estandar de Producción</td>
+                            <td><button type="button" class="btn rounded-pill btn-danger">SOBRECARGA</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% endif %}
+  </section>
+{% endblock %}
 
 {% block script %}
 <script>
@@ -655,3 +493,4 @@ INICIO :: CORTE DEL SANTA
 });
 </script>
 {% endblock %}
+

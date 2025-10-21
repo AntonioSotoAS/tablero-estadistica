@@ -1,6 +1,18 @@
 {% extends "base/base.html" %}
 {% load static %}
-<title>{% block title %} Jueces Listar :: Estadistica {% endblock %} </title>
+<title>{% block title %} Instancias en Módulos :: Estadistica {% endblock %} </title>
+
+{% block datatable_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+{% endblock  %}
+
+{% block select_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/bootstrap-select/bootstrap-select.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/form-validation/form-validation.css' %}" />
+{% endblock  %}
 
 {% block nav %}
 <nav style="padding: 40px 10px; height: 70px;"
@@ -74,6 +86,40 @@
 {% endblock  %}
 
 {% block body_container %}
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddInstancia" aria-labelledby="offcanvasAddInstanciaLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasAddInstanciaLabel">Agregar instancia al módulo</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form id="formAddInstancia" method="post" action="">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Instancia</label>
+        {{ form.n_instancia }}
+      </div>
+
+      {# Errores no-AJAX #}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+      {% endif %}
+      {% for field in form %}
+        {% if field.errors %}
+          <div class="alert alert-danger py-2 mb-2">
+            <strong>{{ field.label }}:</strong> {{ field.errors|striptags }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="offcanvas">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
         <div class="col-12">
@@ -85,9 +131,8 @@
                                 <div class="card-body text-nowrap">
                                     <h2 class="card-title mb-0 font-weight-bold">{{modulo.x_nombre}}</h2>
                                     <p class="mb-2"><a href="{% url "est:estadistica_menu" %}">Sistema de Estadistica </a><a href="{% url "est:modulo_list" %}">/ Listar Módulos</a> / {{modulo.x_nombre}}</p>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                                        Agregar Módulos
-                                    </button>
+                                    <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddInstancia">
+                                    Agregar Instancia</button>
                                 </div>
                             </div>
 
@@ -114,6 +159,7 @@
                                 <th class="text-center text-white" style="font-size:14px">INSTANCIA</th>
                                 <th class="text-center text-white" style="font-size:14px">NOMBRE DE INSTANCIA</th>
                                 <th class="text-center text-white" style="font-size:14px">ESTADO</th>
+                                <th class="text-center text-white" style="font-size:14px">OPCIONES</th>
 
                             </tr>
                             </thead>
@@ -126,10 +172,15 @@
                                         <td>({{ dato.n_instancia.x_corto }}) - {{ dato.n_instancia.x_nom_instancia }}</td>
                                         <td class="text-center">
                                             {% if dato.n_instancia.l_ind_baja == "N" %}
-                                                <span class="badge bg-success">Activo</span>
+                                                <span class="badge bg-label-success">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:5px" width="15" viewBox="0 0 448 512"><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>
+                                                    Activo
+                                                </span>
                                             {% else %}
-                                                <span class="badge bg-danger">Inactivo</span>
+                                                <span class="badge bg-label-danger">Inactivo</span>
                                             {% endif %}
+                                        </td>
+                                        <td>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -141,6 +192,18 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block form_js %}
+<script src="{% static 'base/vendor/bootstrap-select/bootstrap-select.js' %}"></script>
+<script src="{% static 'base/vendor/select2/select2.js' %}"></script>
+<script src="{% static 'base/vendor/form-validation/popular.js' %}"></script>
+<script src="{% static 'base/vendor/form-validation/bootstrap5.js' %}"></script>
+<script src="{% static 'base/vendor/form-validation/auto-focus.js' %}"></script>
+{% endblock %}
+
+{% block datatable_js %}
+<script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
 {% endblock %}
 
 {% block datatable %}
@@ -282,4 +345,6 @@
     });
     
 </script>
-{% endblock  %}
+
+
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Descripción Módulos :: Estadistica{% endblock  %}
+{% block title_nav %}Descripción {{modulo}} {% endblock  %}
+
+    {% block datatable_css %}
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+    <link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+    {% endblock  %}
+
+{% block body_container %}
+<section class="content">
+    <div class="container-xxl flex-grow-1 container-p-y mt-5">
+        {% if perms.est.list_mae_est_modulos or perms.est.list_mov_est_modulo_usuarios %}        
+        <div class="row ">
+                <div class="col-lg-3 col-sm-6 mb-3">
+                    <a href="{% url "est:estadistica_modulo_grafica" modulo.pk %}"  class="text-dark">
+                        <div class="card card-border-shadow-dark h-100">
+                            <div class="card-body p-4">
+                            <img src="{% static "base/img/Icon/judicial_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                                <h5 class="mb-0 text-center">MES IDEAL DE LOS JUZGADOS</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>   
+                <div class="col-lg-3 col-sm-6 mb-3">
+                    <a href="{% url "est:estadistica_actual_cerrado" modulo.pk %}"  class="text-dark">
+                        <div class="card card-border-shadow-dark h-100">
+                            <div class="card-body p-4">
+                            <img src="{% static "base/img/Icon/judicial_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                                <h5 class="mb-0 text-center">MES ACTUAL VS MES CERRADO</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>   
+                
+                <div class="col-lg-3 col-sm-6 mb-3">
+                    <a href="{% url "est:estadistica_mensual" modulo.pk %}"  class="text-dark">
+                        <div class="card card-border-shadow-dark h-100">
+                            <div class="card-body p-4">
+                            <img src="{% static "base/img/Icon/judicial_n.png" %}" class="img-fluid w-25 mx-auto d-block">
+                                <h5 class="mb-0 text-center">METAS DE ENERO A DICIEMBRE</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div> 
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <h3 class="font-weight-bold">JUECES DEL {{modulo}}</h3>
+            {% regroup jueces_modulo by org_jurisd as grupos %}
+            <div class="nav-align-left nav-tabs-shadow px-0">
+                
+                <ul class="mt-5 mx-2 nav nav-pills flex-wrap gap-2 mb-3" id="orgTab" role="tablist">
+                {% for g in grupos %}
+                    {% with gid=g.grouper|slugify %}
+                    <li class="nav-item " role="presentation">
+                    <button
+                        class="nav-link {% if forloop.first %}active{% endif %}"
+                        id="pill-{{ gid }}-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pill-{{ gid }}"
+                        type="button" role="tab"
+                        aria-controls="pill-{{ gid }}"
+                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                        {{ g.grouper }}
+                        <span class="badge bg-secondary ms-1">{{ g.list|length }}</span>
+                    </button>
+                    </li>
+                    {% endwith %}
+                {% endfor %}
+                </ul>
+
+                {# CONTENEDOR para panes (los inactivos no ocupan altura) #}
+                <div class="tab-content" id="orgTabContent">
+                {% for g in grupos %}
+                    {% with gid=g.grouper|slugify %}
+                    <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="pill-{{ gid }}" role="tabpanel" aria-labelledby="pill-{{ gid }}-tab" tabindex="0">
+
+                    {% if g.list %}
+                                
+                        <div class="row g-3">
+                            {% for a in g.list %}
+                            <div class="col-12 col-md-6 col-lg-6">
+
+                                <div class="d-flex align-items-center gap-3">
+                                    {# FOTO DEL JUEZ - reemplaza a.foto por tu campo real #}
+                                    {% with u=a.n_id_juez.usuario %}
+                                    <img
+                                    src="{% if u.profile_image %}{{ u.profile_image.url }}{% else %}{{ MEDIA_URL }}img_perfil/administrador.png{% endif %}"
+                                    alt="Foto de {{ a.juez_fullname }}"
+                                    class="rounded-circle border"
+                                    style="width:84px;height:84px;object-fit:cover;"
+                                    >
+                                    {% endwith %}
+                                    <div class="flex-grow-1">
+                                    <div class="fw-semibold text-uppercase">{{ a.juez_fullname }}</div>
+                                    <div class="small text-muted">
+                                        {{ a.instancia_nombre }}
+                                        {% if a.instancia_corto %}<span class="text-uppercase"> · {{ a.instancia_corto }}</span>{% endif %}
+                                    </div>
+                                    {# Extra opcional: etiquetas/acciones #}
+                                    {# <span class="badge bg-label-info mt-2">Titular</span> #}
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% endfor %}
+                        </div>
+                    
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-2">🗂️</div>
+                        <h6 class="mb-1">Sin registros</h6>
+                        <small class="text-muted">Este órgano jurisdiccional no tiene jueces configurados.</small>
+                    </div>
+                    {% endif %}
+
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+{% endblock  %}
+
+{% block datatable_js %}
+<script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
+{% endblock %}
+
+{% block datatable %}
+    <script>
+        $(document).ready(function(){
+            $('.table').DataTable({
+                "pageLength": 6, // Muestra 25 filas por página al cargar
+                "lengthMenu": [ [6,15,30, 50, 100, -1], [6,15,30, 50, 100, "Todos"] ],
+                autoWidth: false,
+                responsive: true,
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
+    </script>
+{% endblock  %}
+

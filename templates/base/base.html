@@ -16,12 +16,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-      <title>{% block title %}  {% endblock %} </title>
+    <title>{% block title %}  {% endblock %} </title>
 
     <meta name="description" content="" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static "base/img/Icon/grafico.png" %}  " />
+    <link rel="icon" type="image/x-icon" href="{% static "base/img/estadistica.ico" %}  " />
+    <link rel="manifest" href="{% static 'manifest.json' %}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,35 +31,39 @@
       href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
       rel="stylesheet" />
       
+    <!-- Comunes -->
 
-
-    <!-- Icons -->
-    <link rel="stylesheet" href="{% static 'base/vendor/sweetalert2/sweetalert2.css'%}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/fonts/fontawesome.css' %}" type="text/css">
-    <link rel="stylesheet" href="{% static 'base/vendor/fonts/tabler-icons.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/fonts/flag-icons.css' %}" />
-
-    <!-- Core -->
     <link rel="stylesheet" href="{% static 'base/css/core.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'base/css/theme-default.css' %}" type="text/css">
-
-    <link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
-
     <link rel="stylesheet" href="{% static 'base/vendor/perfect-scrollbar/perfect-scrollbar.css'%}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/swiper/swiper.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/stepper/stepper.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/bootstrap-select/bootstrap-select.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/select2/select2.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/form-validation/form-validation.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/css/cards-advance.css' %}" />
-    <link rel="stylesheet" href="{% static 'base/vendor/apex-charts/apex-charts.css' %}" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'base/vendor/fonts/tabler-icons.css' %}" />
+
+
+    {% block datatable_css %} {% endblock  %}
+    {% block select_css %} {% endblock  %}
+    {% block grafico_css %}{% endblock  %}
+    {% block stepper_css %}{% endblock  %}
+    {% block alertas_css %}{% endblock  %}
+    {% block extra_css %}{% endblock  %}
+    {% block swiper_css %}{% endblock  %}
+    {% block date_range_css %}{% endblock  %}
     <script src="{% static "base/js/helpers.js" %}"></script>
     <script src=" {% static "base/js/config.js" %}"></script>
     
   </head>
+  
+  <style>
+  .layout-menu-collapsed .install-label {
+    display: none;
+  }
+
+  /* Centra el botón cuando solo queda el ícono */
+  .layout-menu-collapsed #install-button {
+    text-align: center;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  </style>
 
   <body>
     {% block login %}{% endblock %}
@@ -87,7 +92,7 @@
           {% comment %}? ======== USUARIO ============ {% endcomment %}
           <ul class="menu-inner py-1">
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link ">
                 <img src="{{ user.profile_image.url }}" alt="Imagen de perfil" class="rounded-circle menu-icon" />
                 <div>{{user.x_nombres}} {{user.x_app_paterno}}</div>
               </a>
@@ -115,7 +120,7 @@
             {% if perms.est.list_mae_est_modulos or perms.est.list_mov_est_modulo_usuarios %}
               <li class="menu-item">
                 <a href="{% url "est:estadistica_menu" %}" class="menu-link">
-                  <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                   <div>Estadística</div>
                 </a>
               </li>
@@ -124,35 +129,28 @@
             {% if perms.est.list_mae_est_modulos %}
               <li class="menu-item">
                 <a href="{% url "est:logistica_menu" %}" class="menu-link">
-                  <img src="{% static "base/img/Icon/logistica_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 512"><path d="M112 0C85.5 0 64 21.5 64 48l0 48L16 96c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 208 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 160l-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l16 0 176 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 224l-48 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0 144 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L64 288l0 128c0 53 43 96 96 96s96-43 96-96l128 0c0 53 43 96 96 96s96-43 96-96l32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64 0-32 0-18.7c0-17-6.7-33.3-18.7-45.3L512 114.7c-12-12-28.3-18.7-45.3-18.7L416 96l0-48c0-26.5-21.5-48-48-48L112 0zM544 237.3l0 18.7-128 0 0-96 50.7 0L544 237.3zM160 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm272 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0z"/></svg>
                   <div>Logística</div>
                 </a>
               </li>
 
               <li class="menu-item">
                 <a href="{% url "est:presupuesto_menu" %}" class="menu-link">
-                  <img src="{% static "base/img/Icon/presupuesto_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 560 512"><path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM64 80c0-8.8 7.2-16 16-16l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16L80 96c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16zm128 72c8.8 0 16 7.2 16 16l0 17.3c8.5 1.2 16.7 3.1 24.1 5.1c8.5 2.3 13.6 11 11.3 19.6s-11 13.6-19.6 11.3c-11.1-3-22-5.2-32.1-5.3c-8.4-.1-17.4 1.8-23.6 5.5c-5.7 3.4-8.1 7.3-8.1 12.8c0 3.7 1.3 6.5 7.3 10.1c6.9 4.1 16.6 7.1 29.2 10.9l.5 .1s0 0 0 0s0 0 0 0c11.3 3.4 25.3 7.6 36.3 14.6c12.1 7.6 22.4 19.7 22.7 38.2c.3 19.3-9.6 33.3-22.9 41.6c-7.7 4.8-16.4 7.6-25.1 9.1l0 17.1c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-17.8c-11.2-2.1-21.7-5.7-30.9-8.9c0 0 0 0 0 0c-2.1-.7-4.2-1.4-6.2-2.1c-8.4-2.8-12.9-11.9-10.1-20.2s11.9-12.9 20.2-10.1c2.5 .8 4.8 1.6 7.1 2.4c0 0 0 0 0 0s0 0 0 0s0 0 0 0c13.6 4.6 24.6 8.4 36.3 8.7c9.1 .3 17.9-1.7 23.7-5.3c5.1-3.2 7.9-7.3 7.8-14c-.1-4.6-1.8-7.8-7.7-11.6c-6.8-4.3-16.5-7.4-29-11.2l-1.6-.5s0 0 0 0c-11-3.3-24.3-7.3-34.8-13.7c-12-7.2-22.6-18.9-22.7-37.3c-.1-19.4 10.8-32.8 23.8-40.5c7.5-4.4 15.8-7.2 24.1-8.7l0-17.3c0-8.8 7.2-16 16-16z"/></svg>
                   <div>Presupuesto</div>
                 </a>
               </li>
 
               <li class="menu-item">
                 <a href="{% url "est:depositos_menu" %}" class="menu-link">
-                  <img src="{% static "base/img/Icon/deposito_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 576 512"><path d="M312 24l0 10.5c6.4 1.2 12.6 2.7 18.2 4.2c12.8 3.4 20.4 16.6 17 29.4s-16.6 20.4-29.4 17c-10.9-2.9-21.1-4.9-30.2-5c-7.3-.1-14.7 1.7-19.4 4.4c-2.1 1.3-3.1 2.4-3.5 3c-.3 .5-.7 1.2-.7 2.8c0 .3 0 .5 0 .6c.2 .2 .9 1.2 3.3 2.6c5.8 3.5 14.4 6.2 27.4 10.1l.9 .3s0 0 0 0c11.1 3.3 25.9 7.8 37.9 15.3c13.7 8.6 26.1 22.9 26.4 44.9c.3 22.5-11.4 38.9-26.7 48.5c-6.7 4.1-13.9 7-21.3 8.8l0 10.6c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-11.4c-9.5-2.3-18.2-5.3-25.6-7.8c-2.1-.7-4.1-1.4-6-2c-12.6-4.2-19.4-17.8-15.2-30.4s17.8-19.4 30.4-15.2c2.6 .9 5 1.7 7.3 2.5c13.6 4.6 23.4 7.9 33.9 8.3c8 .3 15.1-1.6 19.2-4.1c1.9-1.2 2.8-2.2 3.2-2.9c.4-.6 .9-1.8 .8-4.1l0-.2c0-1 0-2.1-4-4.6c-5.7-3.6-14.3-6.4-27.1-10.3l-1.9-.6c-10.8-3.2-25-7.5-36.4-14.4c-13.5-8.1-26.5-22-26.6-44.1c-.1-22.9 12.9-38.6 27.7-47.4c6.4-3.8 13.3-6.4 20.2-8.2L264 24c0-13.3 10.7-24 24-24s24 10.7 24 24zM568.2 336.3c13.1 17.8 9.3 42.8-8.5 55.9L433.1 485.5c-23.4 17.2-51.6 26.5-80.7 26.5L192 512 32 512c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l36.8 0 44.9-36c22.7-18.2 50.9-28 80-28l78.3 0 16 0 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0-16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16l120.6 0 119.7-88.2c17.8-13.1 42.8-9.3 55.9 8.5zM193.6 384c0 0 0 0 0 0l-.9 0c.3 0 .6 0 .9 0z"/></svg>
                   <div>Depósitos</div>
                 </a>
               </li>
 
               <li class="menu-item">
-                <a href="{% url "est:camaras_menu" %}" class="menu-link">
-                  <img src="{% static "base/img/Icon/camara_black.png" %}" alt="ima_geneOficio" class="menu-icon">
-                  <div>Cámaras</div>
-                </a>
-              </li>
-
-              <li class="menu-item">
                 <a href="" class="menu-link">
-                  <img src="{% static "base/img/Icon/notificacion_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 512"><path d="M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0S0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4c-3.5 9.4-8.7 17.7-14.2 24.7c-4.8 6.2-9.7 11-13.3 14.3c-1.8 1.6-3.3 2.9-4.3 3.7c-.5 .4-.9 .7-1.1 .8l-.2 .2s0 0 0 0s0 0 0 0C1 327.2-1.4 334.4 .8 340.9S9.1 352 16 352c21.8 0 43.8-5.6 62.1-12.5c9.2-3.5 17.8-7.4 25.2-11.4C134.1 343.3 169.8 352 208 352zM448 176c0 112.3-99.1 196.9-216.5 207C255.8 457.4 336.4 512 432 512c38.2 0 73.9-8.7 104.7-23.9c7.5 4 16 7.9 25.2 11.4c18.3 6.9 40.3 12.5 62.1 12.5c6.9 0 13.1-4.5 15.2-11.1c2.1-6.6-.2-13.8-5.8-17.9c0 0 0 0 0 0s0 0 0 0l-.2-.2c-.2-.2-.6-.4-1.1-.8c-1-.8-2.5-2-4.3-3.7c-3.6-3.3-8.5-8.1-13.3-14.3c-5.5-7-10.7-15.4-14.2-24.7c24.9-29 39.6-64.7 39.6-103.4c0-92.8-84.9-168.9-192.6-175.5c.4 5.1 .6 10.3 .6 15.5z"/></svg>
                   <div>Notificación</div>
                 </a>
               </li>
@@ -170,26 +168,54 @@
             {% comment %} ESTADISTICA {% endcomment %}
             <li class="menu-item">
               <a href="{% url "est:estadistica_menu" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                 <div>Estadística</div>
               </a>
             </li>
-
+            
             {% comment %} ESCALA {% endcomment %}
             <li class="menu-item">
               <a href="{% url "est:escala_list" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/escala_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 512 512"><path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm320 96c0-15.9-5.8-30.4-15.3-41.6l76.6-147.4c6.1-11.8 1.5-26.3-10.2-32.4s-26.2-1.5-32.4 10.2L262.1 288.3c-2-.2-4-.3-6.1-.3c-35.3 0-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z"/></svg>
                 <div>Escalas</div>
               </a>
             </li>
 
-            {% comment %} ESTANDAR DE PRODUCCION {% endcomment %}
             <li class="menu-item">
-              <a href="{% url "est:estandar_prod_list" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/productividad_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
-                <div>Estandar de Produccion</div>
+              <a href="{% url "est:configuracion_metas_list" %}" class="menu-link">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 640"><path d="M102.8 57.3C108.2 51.9 116.6 51.1 123 55.3L241.9 134.5C250.8 140.4 256.1 150.4 256.1 161.1L256.1 210.7L346.9 301.5C380.2 286.5 420.8 292.6 448.1 320L574.2 446.1C592.9 464.8 592.9 495.2 574.2 514L514.1 574.1C495.4 592.8 465 592.8 446.2 574.1L320.1 448C292.7 420.6 286.6 380.1 301.6 346.8L210.8 256L161.2 256C150.5 256 140.5 250.7 134.6 241.8L55.4 122.9C51.2 116.6 52 108.1 57.4 102.7L102.8 57.3zM247.8 360.8C241.5 397.7 250.1 436.7 274 468L179.1 563C151 591.1 105.4 591.1 77.3 563C49.2 534.9 49.2 489.3 77.3 461.2L212.7 325.7L247.9 360.8zM416.1 64C436.2 64 455.5 67.7 473.2 74.5C483.2 78.3 485 91 477.5 98.6L420.8 155.3C417.8 158.3 416.1 162.4 416.1 166.6L416.1 208C416.1 216.8 423.3 224 432.1 224L473.5 224C477.7 224 481.8 222.3 484.8 219.3L541.5 162.6C549.1 155.1 561.8 156.9 565.6 166.9C572.4 184.6 576.1 203.9 576.1 224C576.1 267.2 558.9 306.3 531.1 335.1L482 286C448.9 253 403.5 240.3 360.9 247.6L304.1 190.8L304.1 161.1L303.9 156.1C303.1 143.7 299.5 131.8 293.4 121.2C322.8 86.2 366.8 64 416.1 63.9z"/></svg>
+                <div>Configuracion Metas</div>
               </a>
             </li>
+
+            <li class="menu-item">
+              <a href="{% url "est:metas_resumen_list" %}" class="menu-link">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 640"><path d="M102.8 57.3C108.2 51.9 116.6 51.1 123 55.3L241.9 134.5C250.8 140.4 256.1 150.4 256.1 161.1L256.1 210.7L346.9 301.5C380.2 286.5 420.8 292.6 448.1 320L574.2 446.1C592.9 464.8 592.9 495.2 574.2 514L514.1 574.1C495.4 592.8 465 592.8 446.2 574.1L320.1 448C292.7 420.6 286.6 380.1 301.6 346.8L210.8 256L161.2 256C150.5 256 140.5 250.7 134.6 241.8L55.4 122.9C51.2 116.6 52 108.1 57.4 102.7L102.8 57.3zM247.8 360.8C241.5 397.7 250.1 436.7 274 468L179.1 563C151 591.1 105.4 591.1 77.3 563C49.2 534.9 49.2 489.3 77.3 461.2L212.7 325.7L247.9 360.8zM416.1 64C436.2 64 455.5 67.7 473.2 74.5C483.2 78.3 485 91 477.5 98.6L420.8 155.3C417.8 158.3 416.1 162.4 416.1 166.6L416.1 208C416.1 216.8 423.3 224 432.1 224L473.5 224C477.7 224 481.8 222.3 484.8 219.3L541.5 162.6C549.1 155.1 561.8 156.9 565.6 166.9C572.4 184.6 576.1 203.9 576.1 224C576.1 267.2 558.9 306.3 531.1 335.1L482 286C448.9 253 403.5 240.3 360.9 247.6L304.1 190.8L304.1 161.1L303.9 156.1C303.1 143.7 299.5 131.8 293.4 121.2C322.8 86.2 366.8 64 416.1 63.9z"/></svg>
+                <div>Meta Configuracion</div>
+              </a>
+            </li>
+
+                        <li class="menu-item">
+              <a href="{% url "est:meta_resumen_b_list" %}" class="menu-link">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 640"><path d="M102.8 57.3C108.2 51.9 116.6 51.1 123 55.3L241.9 134.5C250.8 140.4 256.1 150.4 256.1 161.1L256.1 210.7L346.9 301.5C380.2 286.5 420.8 292.6 448.1 320L574.2 446.1C592.9 464.8 592.9 495.2 574.2 514L514.1 574.1C495.4 592.8 465 592.8 446.2 574.1L320.1 448C292.7 420.6 286.6 380.1 301.6 346.8L210.8 256L161.2 256C150.5 256 140.5 250.7 134.6 241.8L55.4 122.9C51.2 116.6 52 108.1 57.4 102.7L102.8 57.3zM247.8 360.8C241.5 397.7 250.1 436.7 274 468L179.1 563C151 591.1 105.4 591.1 77.3 563C49.2 534.9 49.2 489.3 77.3 461.2L212.7 325.7L247.9 360.8zM416.1 64C436.2 64 455.5 67.7 473.2 74.5C483.2 78.3 485 91 477.5 98.6L420.8 155.3C417.8 158.3 416.1 162.4 416.1 166.6L416.1 208C416.1 216.8 423.3 224 432.1 224L473.5 224C477.7 224 481.8 222.3 484.8 219.3L541.5 162.6C549.1 155.1 561.8 156.9 565.6 166.9C572.4 184.6 576.1 203.9 576.1 224C576.1 267.2 558.9 306.3 531.1 335.1L482 286C448.9 253 403.5 240.3 360.9 247.6L304.1 190.8L304.1 161.1L303.9 156.1C303.1 143.7 299.5 131.8 293.4 121.2C322.8 86.2 366.8 64 416.1 63.9z"/></svg>
+                <div>Meta Configuracion Parcial</div>
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="{% url "est:metas_cuadro_mensual" %}" class="menu-link">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 640"><path d="M102.8 57.3C108.2 51.9 116.6 51.1 123 55.3L241.9 134.5C250.8 140.4 256.1 150.4 256.1 161.1L256.1 210.7L346.9 301.5C380.2 286.5 420.8 292.6 448.1 320L574.2 446.1C592.9 464.8 592.9 495.2 574.2 514L514.1 574.1C495.4 592.8 465 592.8 446.2 574.1L320.1 448C292.7 420.6 286.6 380.1 301.6 346.8L210.8 256L161.2 256C150.5 256 140.5 250.7 134.6 241.8L55.4 122.9C51.2 116.6 52 108.1 57.4 102.7L102.8 57.3zM247.8 360.8C241.5 397.7 250.1 436.7 274 468L179.1 563C151 591.1 105.4 591.1 77.3 563C49.2 534.9 49.2 489.3 77.3 461.2L212.7 325.7L247.9 360.8zM416.1 64C436.2 64 455.5 67.7 473.2 74.5C483.2 78.3 485 91 477.5 98.6L420.8 155.3C417.8 158.3 416.1 162.4 416.1 166.6L416.1 208C416.1 216.8 423.3 224 432.1 224L473.5 224C477.7 224 481.8 222.3 484.8 219.3L541.5 162.6C549.1 155.1 561.8 156.9 565.6 166.9C572.4 184.6 576.1 203.9 576.1 224C576.1 267.2 558.9 306.3 531.1 335.1L482 286C448.9 253 403.5 240.3 360.9 247.6L304.1 190.8L304.1 161.1L303.9 156.1C303.1 143.7 299.5 131.8 293.4 121.2C322.8 86.2 366.8 64 416.1 63.9z"/></svg>
+                <div>Cuadro Mensual</div>
+              </a>
+            </li>
+
+            {% comment %} ESTANDAR DE PRODUCCION 
+            <li class="menu-item">
+              <a href="{% url "est:estandar_prod_list" %}" class="menu-link">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M0 416c0 17.7 14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384c-17.7 0-32 14.3-32 32zm128 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM320 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm32-80c-32.8 0-61 19.7-73.3 48L32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48zM192 128a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm73.3-64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64z"/></svg>
+                <div>Estandar de Produccion</div>
+              </a>
+            </li>{% endcomment %}
             
             {% endif %}
 
@@ -204,7 +230,7 @@
             {% comment %} USUARIOS {% endcomment %}
             <li class="menu-item">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <img src="{% static 'base/img/Icon/usuarios_gris.png' %}" alt="usuarios" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 512"><path d="M144 0a80 80 0 1 1 0 160A80 80 0 1 1 144 0zM512 0a80 80 0 1 1 0 160A80 80 0 1 1 512 0zM0 298.7C0 239.8 47.8 192 106.7 192l42.7 0c15.9 0 31 3.5 44.6 9.7c-1.3 7.2-1.9 14.7-1.9 22.3c0 38.2 16.8 72.5 43.3 96c-.2 0-.4 0-.7 0L21.3 320C9.6 320 0 310.4 0 298.7zM405.3 320c-.2 0-.4 0-.7 0c26.6-23.5 43.3-57.8 43.3-96c0-7.6-.7-15-1.9-22.3c13.6-6.3 28.7-9.7 44.6-9.7l42.7 0C592.2 192 640 239.8 640 298.7c0 11.8-9.6 21.3-21.3 21.3l-213.3 0zM224 224a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zM128 485.3C128 411.7 187.7 352 261.3 352l117.3 0C452.3 352 512 411.7 512 485.3c0 14.7-11.9 26.7-26.7 26.7l-330.7 0c-14.7 0-26.7-11.9-26.7-26.7z"/></svg>
                 <div>Usuarios</div>
               </a>
 
@@ -223,10 +249,13 @@
               </ul>
             </li>
 
+            {% endif %}
+
+            {% if perms.est.list_mae_est_modulos %}
             <li class="menu-item">
-              <a href="{% url "bases:listar_accesos" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/instancia_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
-                <div>Ingresos de Usuarios</div>
+              <a href="{% url "bases:auditoria_login" %}" class="menu-link">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon " viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                <div data-i18n="Email">Auditoria Login</div>
               </a>
             </li>
             {% endif %}
@@ -235,7 +264,7 @@
             {% if perms.est.view_mae_est_instancia %}
             <li class="menu-item">
               <a href="{% url "est:instancia_list" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/instancia_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 512 512"><path d="M318.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-120 120c-12.5 12.5-12.5 32.8 0 45.3l16 16c12.5 12.5 32.8 12.5 45.3 0l4-4L325.4 293.4l-4 4c-12.5 12.5-12.5 32.8 0 45.3l16 16c12.5 12.5 32.8 12.5 45.3 0l120-120c12.5-12.5 12.5-32.8 0-45.3l-16-16c-12.5-12.5-32.8-12.5-45.3 0l-4 4L330.6 74.6l4-4c12.5-12.5 12.5-32.8 0-45.3l-16-16zm-152 288c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l48 48c12.5 12.5 32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-1.4-1.4L272 285.3 226.7 240 168 298.7l-1.4-1.4z"/></svg>
                 <div>Instancias</div>
               </a>
             </li>
@@ -245,7 +274,7 @@
             {% if perms.est.view_mae_est_jueces %}
             <li class="menu-item">
               <a href="{% url "est:jueces_list" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/jueces_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 640 512"><path d="M384 32l128 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L398.4 96c-5.2 25.8-22.9 47.1-46.4 57.3L352 448l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l160 0 0-294.7c-23.5-10.3-41.2-31.6-46.4-57.3L128 96c-17.7 0-32-14.3-32-32s14.3-32 32-32l128 0c14.6-19.4 37.8-32 64-32s49.4 12.6 64 32zm55.6 288l144.9 0L512 195.8 439.6 320zM512 416c-62.9 0-115.2-34-126-78.9c-2.6-11 1-22.3 6.7-32.1l95.2-163.2c5-8.6 14.2-13.8 24.1-13.8s19.1 5.3 24.1 13.8l95.2 163.2c5.7 9.8 9.3 21.1 6.7 32.1C627.2 382 574.9 416 512 416zM126.8 195.8L54.4 320l144.9 0L126.8 195.8zM.9 337.1c-2.6-11 1-22.3 6.7-32.1l95.2-163.2c5-8.6 14.2-13.8 24.1-13.8s19.1 5.3 24.1 13.8l95.2 163.2c5.7 9.8 9.3 21.1 6.7 32.1C242 382 189.7 416 126.8 416S11.7 382 .9 337.1z"/></svg>
                 <div>Jueces</div>
               </a>
             </li>
@@ -255,7 +284,7 @@
             {% if perms.est.view_mov_est_instancia_jueces %}
             <li class="menu-item">
               <a href="{% url "est:juez_instancia_list" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/juez.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 576 512"><path d="M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c.2 35.5-28.5 64.3-64 64.3l-320.4 0c-35.3 0-64-28.7-64-64l0-160.4-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24zM352 224a64 64 0 1 0 -128 0 64 64 0 1 0 128 0zm-96 96c-44.2 0-80 35.8-80 80c0 8.8 7.2 16 16 16l192 0c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80l-64 0z"/></svg>
                 <div>Asignar Instancia</div>
               </a>
             </li>
@@ -265,7 +294,7 @@
             {% if perms.est.view_mae_est_modulos %}
             <li class="menu-item">
               <a href="{% url "est:modulo_list" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/modulo_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 512 512"><path d="M243.4 2.6l-224 96c-14 6-21.8 21-18.7 35.8S16.8 160 32 160l0 8c0 13.3 10.7 24 24 24l400 0c13.3 0 24-10.7 24-24l0-8c15.2 0 28.3-10.7 31.3-25.6s-4.8-29.9-18.7-35.8l-224-96c-8-3.4-17.2-3.4-25.2 0zM128 224l-64 0 0 196.3c-.6 .3-1.2 .7-1.8 1.1l-48 32c-11.7 7.8-17 22.4-12.9 35.9S17.9 512 32 512l448 0c14.1 0 26.5-9.2 30.6-22.7s-1.1-28.1-12.9-35.9l-48-32c-.6-.4-1.2-.7-1.8-1.1L448 224l-64 0 0 192-40 0 0-192-64 0 0 192-48 0 0-192-64 0 0 192-40 0 0-192zM256 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
                 <div>Módulos</div>
               </a>
             </li>
@@ -282,7 +311,7 @@
             {% comment %} Nivel de Producción {% endcomment %}
             <li class="menu-item">
               <a href="{% url "est:nivel_productividad" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 576 512"><path d="M304 240l0-223.4c0-9 7-16.6 16-16.6C443.7 0 544 100.3 544 224c0 9-7.6 16-16.6 16L304 240zM32 272C32 150.7 122.1 50.3 239 34.3c9.2-1.3 17 6.1 17 15.4L256 288 412.5 444.5c6.7 6.7 6.2 17.7-1.5 23.1C371.8 495.6 323.8 512 272 512C139.5 512 32 404.6 32 272zm526.4 16c9.3 0 16.6 7.8 15.4 17c-7.7 55.9-34.6 105.6-73.9 142.3c-6 5.6-15.4 5.2-21.2-.7L320 288l238.4 0z"/></svg>
                 <div>Nivel de Produccion</div>
               </a>
             </li>
@@ -291,20 +320,86 @@
             {% if perms.est.list_mae_est_jueces or perms.est.list_mae_est_organo_jurisdiccionales %}
             <li class="menu-item">
               <a href="{% url "est:power_estadistica" %}" class="menu-link">
-                <img src="{% static "base/img/Icon/grafico_gris.png" %}" alt="ima_geneOficio" class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="menu-icon" viewBox="0 0 512 512"><path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm96 288l288 0c17.7 0 32-14.3 32-32l0-68.2c0-7.6-2.7-15-7.7-20.8l-65.8-76.8c-12.1-14.2-33.7-15-46.9-1.8l-21 21c-10 10-26.4 9.2-35.4-1.6l-39.2-47c-12.6-15.1-35.7-15.4-48.7-.6L135.9 215c-5.1 5.8-7.9 13.3-7.9 21.1l0 84c0 17.7 14.3 32 32 32z"/></svg>
                 <div>Dashboard Estadístico</div>
               </a>
             </li>
             {% endif %}
           </ul>
+
+          <div class="menu-item px-3 pb-3 text-center">
+            <button class="btn btn-dark shadow " id="install-button" >
+              📲 <span class="install-label">Instalar App PJ</span>
+            </button>
+          </div>
         </aside>
 
 
-       
+
         <div class="layout-page">
           {% block nav %}{% endblock %}
 
           <div class="content-wrapper">
+
+              <nav style="padding: 40px 10px; height: 70px;" class="layout-navbar container-xxl navbar py-4 navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+                  id="layout-navbar">
+                  <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                      <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                      <i class="ti ti-menu-2 ti-md"></i>
+                      </a>
+                  </div>
+
+                  <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                      <div class="navbar-nav align-items-center ">                          
+                          <h3 class="d-none d-md-inline-block font-weight-bold pt-4">{% block title_nav %}{% endblock %} <br></h3>
+                      </div>
+
+                      <ul class="navbar-nav flex-row align-items-center ms-auto">
+                          <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                              <a
+                                  class="nav-link dropdown-toggle hide-arrow p-0"
+                                  href=""
+                                  data-bs-toggle="dropdown">
+                                  <div class="avatar avatar-online">
+                                  <img src="{% static "base/img/Icon/user.png" %}" alt class="rounded-circle" />
+                                  </div>
+                              </a>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                  <li>
+                                  <a class="dropdown-item mt-0" >
+                                      <div class="d-flex align-items-center">
+                                      <div class="flex-shrink-0 me-2">
+                                          <div class="avatar avatar-online">
+                                          <img src="{% static "base/img/Icon/user.png" %}" alt="" class="rounded-circle" />
+                                          </div>
+                                      </div>
+                                      <div class="flex-grow-1">
+                                          <h6 class="mb-0">{{user.x_nombres}} {{user.x_app_paterno}}</h6>
+                                      </div>
+                                      </div>
+                                  </a>
+                                  </li>
+                                  <li>
+                                  <div class="dropdown-divider my-1 mx-n2"></div>
+                                  </li>
+                                  <li>
+                                  <a class="dropdown-item" href="{% url "bases:cambiar_password" %}">
+                                      <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Cambiar Clave</span>
+                                  </a>
+                                  </li>
+                                  <li>
+                                  <div class="d-grid px-2 pt-2 pb-1">
+                                      <a class="btn btn-sm btn-danger d-flex" href="{% url "bases:logout" %}">
+                                      <small class="align-middle">Cerrar Sesión</small>
+                                      <i class="ti ti-logout ms-2 ti-14px"></i>
+                                      </a>
+                                  </div>
+                                  </li>
+                              </ul>
+                          </li>
+                      </ul>
+                  </div>
+              </nav>
            
           {% comment %} CUERPO DEL CONTENIDO {% endcomment %}
            {% block body_container %}{% endblock %}
@@ -316,11 +411,12 @@
               <div class="d-flex flex-column flex-sm-row">
 
                 <a href="https://api.whatsapp.com/send?phone=+51967996411&text=Necesito%20ayuda%20con%20el%20Sistemas%20Estadistico" class="footer-link me-6">¡Necesito Ayuda!</a>
-                <span>Versión 2.0</span>
+                <span>Versión 2.0.2</span>
               </div>
             </div>
+            
           </footer>
-
+          
             <div class="content-backdrop fade"></div>
           </div>
         </div>
@@ -332,81 +428,55 @@
       <div class="drag-target"></div>
     </div>
     {% endblock %}
-   
 
-
-    <!-- Cargar tus scripts personalizados -->
-    
+    {% comment %} ----- COMUNES ---- {% endcomment %}
+    <script src="{% static 'base/js/boton_install.js' %}"></script>
     <script src="{% static 'base/js/jquery.js' %}"></script>
     <script src="{% static 'base/js/bootstrap.js' %}"></script>
 
     <script src="{% static 'base/vendor/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
     <script src="{% static 'base/js/menu.js' %}"></script>
-
-    <script src="{% static 'base/vendor/apex-charts/apexcharts.js' %}"></script>
-    <script src="{% static 'base/vendor/swiper/swiper.js' %}"></script>
-    <script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
-
-    <script src="{% static 'base/vendor/stepper/stepper.js' %}"></script>
-    <script src="{% static 'base/vendor/bootstrap-select/bootstrap-select.js' %}"></script>
-    <script src="{% static 'base/vendor/select2/select2.js' %}"></script>
-    <script src="{% static 'base/vendor/form-validation/popular.js' %}"></script>
-    <script src="{% static 'base/vendor/form-validation/bootstrap5.js' %}"></script>
-    <script src="{% static 'base/vendor/form-validation/auto-focus.js' %}"></script>
-    
-    <script src="{% static 'base/vendor/sweetalert2/sweetalert2.js' %}"></script>
     <script src="{% static 'base/js/main.js' %}"></script>
-    <script src="{% static 'base/vendor/stepper/form-wizard-numbered.js' %}"></script>
-    <!-- endbuild -->
 
-    
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
-    <script src="{% static 'base/js/dashboards-analytics.js' %}"></script>
-    <script src="{% static 'base/js/charts-chartjs.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    {% block swiper_js %}{% endblock %}
+    {% block grafico_js %}{% endblock %}
+    {% block form_js %}{% endblock %}
+    {% block alerts_js %}{% endblock %}
+    {% block stepper_js %}{% endblock %}
+    {% block date_range_js %}{% endblock %}
+    {% block datatable_js %}{% endblock %}
+    {% block datatable %}{% endblock  %}
+    {% block script %}{% endblock %}
 
-    {% block datatable %}
     <script>
-        $(document).ready(function(){
-            $('.table').DataTable({
-                "pageLength": 25, // Muestra 25 filas por página al cargar
-                "lengthMenu": [ [25,40, 50, 100, -1], [25,40, 50, 100, "Todos"] ],
-                autoWidth: false,
-                responsive: true,
-                language: {
-                    "sProcessing": "Procesando...",
-                    "sLengthMenu": "Mostrar _MENU_ registros",
-                    "sZeroRecords": "No se encontraron resultados",
-                    "sEmptyTable": "Ningún dato disponible en esta tabla",
-                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sSearch": "Buscar:",
-                    "sUrl": "",
-                    "sInfoThousands": ",",
-                    "sLoadingRecords": "Cargando...",
-                    "oPaginate": {
-                        "sFirst": "Primero",
-                        "sLast": "Último",
-                        "sNext": "Siguiente",
-                        "sPrevious": "Anterior"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                    }
-                },
-            });
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installButton = document.getElementById('install-button');
+        installButton.classList.remove('d-none');
+
+        installButton.addEventListener('click', () => {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(choiceResult => {
+            if (choiceResult.outcome === 'accepted') {
+              alert('¡Gracias por instalar!');
+            } else {
+              alert('Quizá más tarde.');
+            }
+            deferredPrompt = null;
+          });
         });
+      });
+
+      window.addEventListener('appinstalled', () => {
+        document.getElementById('install-button').classList.add('d-none');
+      });
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/service-worker.js')
+          .then(reg => console.log('SW registrado', reg))
+          .catch(err => console.error('Fallo SW', err));
+      }
     </script>
-{% endblock  %}
-
-{% block script %}
-{% endblock %}
-
-
   </body>
 </html>

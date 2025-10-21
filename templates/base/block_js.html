@@ -1,0 +1,46 @@
+    {% comment %}
+    Permite crear sliders (deslizadores) táctiles, tipo carruseles, de imágenes, 
+    tarjetas, contenido, etc., con animaciones fluidas y responsive.
+    {% endcomment %}
+    {% block swiper_js %}
+    <script src="{% static 'base/vendor/swiper/swiper.js' %}"></script>
+    {% endblock %}
+
+    {% block grafico_js %}
+    <script src="{% static 'base/vendor/apex-charts/apexcharts.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
+    <script src="{% static 'base/js/charts-chartjs.js' %}"></script>
+    {% endblock %}
+
+    {% block datatable_js %}
+    <script src="{% static 'base/vendor/datatables5/datatables-bootstrap5.js' %}"></script>
+    {% endblock %}
+
+    {% block form_js %}
+    <script src="{% static 'base/vendor/bootstrap-select/bootstrap-select.js' %}"></script>
+    <script src="{% static 'base/vendor/select2/select2.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/popular.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/bootstrap5.js' %}"></script>
+    <script src="{% static 'base/vendor/form-validation/auto-focus.js' %}"></script>
+    {% endblock %}
+
+    {% block alerts_js %}
+    <script src="{% static 'base/vendor/sweetalert2/sweetalert2.js' %}"></script>
+    {% endblock %}
+
+    {% comment %}
+    Mostrar pasos secuenciales en un proceso, como un formulario de varios pasos.
+    {% endcomment %}
+    {% block stepper_js %}
+    <script src="{% static 'base/vendor/stepper/stepper.js' %}"></script>
+    <script src="{% static 'base/vendor/stepper/form-wizard-numbered.js' %}"></script>
+    {% endblock %}
+
+    {% block date_range_js %}
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    {% endblock %}

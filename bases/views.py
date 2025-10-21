@@ -12,7 +12,6 @@ from django.contrib import messages                                             
 from django.contrib.auth.decorators import login_required                               #LoginRequired
 from datetime import datetime                                                           #Datetime
 from django.views.generic import View
-from django.utils.timezone import now
 from django.db.models import Sum
 from datetime import datetime, timedelta     
 from collections import defaultdict
@@ -23,12 +22,19 @@ from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 
+from collections import Counter
+from django.utils.timezone import localtime, now, timedelta
+from django.dispatch import receiver
+import json
+
 #? ===============================================
 #? ================== MODELOS ====================
 from django.contrib.auth.models import User, Group, Permission
 from django.utils.timezone import now, timedelta
 from bases.models import usuario, mae_est_sexos, hst_usuario_accesos
-from est.models import mov_est_instancia_usuarios, mae_est_modulos, mae_est_meta_resumenes, mae_est_instancia, mae_est_organo_jurisdiccionales, mae_est_jueces, mov_est_instancia_jueces, mov_est_modulo_usuarios
+from est.models import mov_est_instancia_usuarios, mae_est_modulos, mae_est_meta_resumenes, mae_est_instancia, mae_est_organo_jurisdiccionales, \
+                        mae_est_jueces, mov_est_instancia_jueces, mov_est_modulo_usuarios, \
+                        hst_usuario_accion
 
 #? ===============================================
 #? =============== FORMULARIOS ===================
@@ -37,6 +43,24 @@ from .forms import UsuarioForm, PasswordChangeForm, UsuarioPassForm, UsuarioEdit
 class Home(LoginRequiredMixin, generic.TemplateView):
     template_name = "bases/home.html"
     login_url = '/login'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            accion = 'ACCEDIO A LA PÁGINA PRINCIPAL'
+
+            # Validar si la acción ya fue registrada en los últimos 10 segundos
+            existe = hst_usuario_accion.objects.filter(
+                usuario=request.user,
+                x_accion=accion,
+                f_fecha_creacion__gte=now() - timedelta(seconds=10)
+            ).exists()
+
+            if not existe:
+                hst_usuario_accion.objects.create(
+                    usuario=request.user,
+                    x_accion=accion
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     #Sobrescribe el método para agregar datos al contexto que será pasado a la plantilla.
     def get_context_data(self, **kwargs):
@@ -141,7 +165,22 @@ class Home(LoginRequiredMixin, generic.TemplateView):
         # Devuelve el contexto completo para que se use en la plantilla.
         return context
 
+@login_required
 def custom_logout_view(request):
+    if request.user.is_authenticated:
+        accion = 'CIERRE DE SESIÓN'
+
+        existe = hst_usuario_accion.objects.filter(
+            usuario=request.user,
+            x_accion=accion,
+            f_fecha_creacion__gte=now() - timedelta(seconds=10)
+        ).exists()
+
+        if not existe:
+            hst_usuario_accion.objects.create(
+                usuario=request.user,
+                x_accion=accion
+            )
     logout(request)
     return redirect ('bases:login')
 
@@ -150,6 +189,7 @@ def custom_logout_view(request):
 #!========================================================
 #? ========================================================
 #? Para Organos Jurisdiccionales
+@login_required
 def Estadistica_por_organo(request):
     # Obtener todas las instancias
     instancias = mae_est_instancia.objects.filter(l_ind_baja='N')
@@ -159,6 +199,7 @@ def Estadistica_por_organo(request):
     }
     return render(request, 'bases/pre_estadistica_organo.html', context)
 
+@login_required
 def obtener_datos_instancia(request):
     if request.method == "GET" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         instancia_id = request.GET.get("instancia_id")
@@ -300,11 +341,55 @@ def Nepena(request):
 #!========================================================
 #!===================== USUARIOS =========================
 #!========================================================
+class UsuarioCreateView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        form = UsuarioForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save(commit=False)
+            # Asignar contraseña en caso se incluya (para nuevos usuarios)
+            password = form.cleaned_data.get("password")
+            if password:
+                user.set_password(password)
+            user.save()
+            return JsonResponse({
+                'success': True,
+                'id': user.id,
+                'username': user.username or '',
+                'x_nombres': user.x_nombres or '',
+                'x_app_paterno': user.x_app_paterno or '',
+                'x_app_materno': user.x_app_materno or '',
+                'image_url': user.profile_image.url if user.profile_image else '/static/img_perfil/perfil.png',
+                'is_active': user.is_active,
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            }, status=400)
+
 class UserView(LoginRequiredMixin,generic.ListView):
     model = usuario
     template_name = "bases/user_listar.html"
     context_object_name = 'obj'
     login_url = 'bases:login'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            accion = 'ACCESO A LISTA DE USUARIOS'
+            existe = hst_usuario_accion.objects.filter(
+                usuario=request.user,
+                x_accion=accion,
+                f_fecha_creacion__gte=now() - timedelta(seconds=10)
+            ).exists()
+            if not existe:
+                hst_usuario_accion.objects.create(
+                    usuario=request.user,
+                    x_accion=accion
+                )
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return usuario.objects.all().order_by('-id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -318,6 +403,7 @@ class UserView(LoginRequiredMixin,generic.ListView):
         # Añadir estas cantidades al contexto
         context['count_masculino'] = count_masculino
         context['count_femenino'] = count_femenino
+        context['form'] = UsuarioForm()
         return context
     
 def UserNew(request,pk=None):
@@ -526,6 +612,7 @@ class UserAssignModulesView(View):
 #!========================================================
 #!=========== GENERAR PDF PARA CREDENCIAL ================
 #!========================================================
+@login_required
 def generar_credenciales_pdf(request, user_id):
     # Obtener el usuario
     user = get_object_or_404(usuario, id=user_id)
@@ -562,6 +649,24 @@ class UserPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     success_url = reverse_lazy('bases:home')  # Redirige después de cambiar la contraseña
 
     def form_valid(self, form):
+
+        accion = 'Abrio pestaña de Cambio de Contraseña'
+        user = self.request.user
+
+        # Buscar si ya existe una acción igual para este usuario en los últimos 10 segundos
+        existe = hst_usuario_accion.objects.filter(
+            usuario=user,
+            x_accion=accion,
+            f_fecha_creacion__gte=now() - timedelta(seconds=10)
+        ).exists()
+
+        # Si no existe, crearla
+        if not existe:
+            hst_usuario_accion.objects.create(
+                usuario=user,
+                x_accion=accion
+            )
+
         # Puedes agregar lógica adicional aquí si es necesario
         messages.success(self.request, "Su contraseña ha sido cambiada con éxito.")
         return super().form_valid(form)
@@ -652,20 +757,78 @@ def group_permiso(request,id_grp,id_perm):
             return JsonResponse({"status": "error", "title": "Acción no reconocida"}, status=400)
     return Http404("Método No Reconocido")
 
-
 #! =======================================================
 
 #! =======================================================
+@login_required
 def listar_accesos(request):
-    # Consulta para listar accesos
     accesos = hst_usuario_accesos.objects.select_related('usuario').all().order_by('-f_fecha_hora')
 
-    # Consulta para contar ingresos por usuario
     ingresos = (
-        hst_usuario_accesos.objects.values('usuario__x_nombres', 'usuario__x_app_paterno')
+        hst_usuario_accesos.objects.values('usuario__x_nombres', 'usuario__x_app_paterno', 'usuario__x_app_materno')
         .annotate(total_ingresos=Count('id'))
-        .order_by('-total_ingresos')  # Ordenar de mayor a menor número de ingresos
+        .order_by('-total_ingresos')
     )
 
-    # Renderizar ambos contextos en la misma plantilla
-    return render(request, 'bases/listar_accesos.html', {'accesos': accesos, 'ingresos': ingresos})
+    # Total de logueos
+    total_logueos = hst_usuario_accesos.objects.count()
+
+    # Logueos del día actual
+    inicio_dia = localtime(now()).replace(hour=0, minute=0, second=0, microsecond=0)
+    fin_dia = inicio_dia.replace(hour=23, minute=59, second=59)
+    logueos_hoy = hst_usuario_accesos.objects.filter(f_fecha_hora__range=(inicio_dia, fin_dia)).count()
+
+    # Logueos de la semana actual
+    hoy = localtime(now()).date()
+    inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes de la semana actual
+    fin_semana = inicio_semana + timedelta(days=6)  # Domingo de la semana actual
+    logueos_semana = hst_usuario_accesos.objects.filter(
+        f_fecha_hora__date__range=(inicio_semana, fin_semana)
+    ).count()
+
+    # Logueos del mes actual
+    inicio_mes = hoy.replace(day=1)  # Primer día del mes actual
+    ultimo_dia_mes = (inicio_mes + timedelta(days=31)).replace(day=1) - timedelta(days=1)  # Último día del mes actual
+    logueos_mes = hst_usuario_accesos.objects.filter(
+        f_fecha_hora__date__range=(inicio_mes, ultimo_dia_mes)
+    ).count()
+
+    # Registros por día de la semana (1=Lun ... 7=Dom)
+    registros = hst_usuario_accesos.objects.filter(
+        f_fecha_hora__date__range=(inicio_semana, fin_semana)
+    )
+
+    # Contar por día de la semana (1=Lun ... 7=Dom)
+    conteo = Counter()
+    for r in registros:
+        dia = localtime(r.f_fecha_hora).isoweekday()  # 1 (Lun) - 7 (Dom)
+        conteo[dia] += 1
+
+    # Ordenar de Lun a Dom
+    conteo_dias = [conteo.get(dia, 0) for dia in range(1, 8)]
+
+    accion = 'Auditoria de Logueo'
+
+    # Buscar si ya existe una acción igual para este usuario en los últimos 10 segundos
+    existe = hst_usuario_accion.objects.filter(
+        usuario=request.user,
+        x_accion=accion,
+        f_fecha_creacion__gte=now() - timedelta(seconds=10)
+    ).exists()
+
+    # Si no existe, crearla
+    if not existe:
+        hst_usuario_accion.objects.create(
+            usuario=request.user,
+            x_accion=accion
+        )
+    
+    return render(request, 'bases/listar_accesos.html', {
+        'accesos': accesos,
+        'ingresos': ingresos,
+        'conteo_dias': json.dumps(conteo_dias),
+        'total_logueos': total_logueos,
+        'logueos_hoy': logueos_hoy,
+        'logueos_semana': logueos_semana,
+        'logueos_mes': logueos_mes,
+    })

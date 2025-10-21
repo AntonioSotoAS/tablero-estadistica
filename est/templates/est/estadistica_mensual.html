@@ -1,0 +1,199 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Módulos :: Estadistica{% endblock  %}
+{% block title_nav %}{% endblock  %}
+
+{% block grafico_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/apex-charts/apex-charts.css' %}" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock  %}
+
+{% block body_container %}
+<style>
+        /* Contenedor del gráfico */
+        #chart-container {
+            width: 100%;
+            height: 60vh; /* Usa una altura relativa a la ventana para adaptarlo */
+            max-height: 600px; /* Máximo para pantallas grandes */
+        }
+    </style>
+
+<section class="content">
+    <div class="container-xxl flex-grow-1 container-p-y pt-5">
+                {% if perms.est.list_mae_est_modulos or perms.est.list_mov_est_modulo_usuarios %}
+
+
+                <div class="row">
+                    <div class="col-12 col-xl-">
+                        <div class="card">
+                            {% for jurisdiccion, instancias in agrupados.items %}
+                            <h3 class="text-center mt-5 mb-0 font-weight-bold">RANKING DE {{ jurisdiccion }}</h3>
+
+                            <!-- Contenedor único del gráfico -->
+                            <div id="graficoPorMes_{{ jurisdiccion|slugify }}" style="width: 100%; height: 500px;"></div>
+
+                            <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                const datosPorMes = {{ datos_por_mes|safe }};
+                                const mesesNombre = {{ meses_nombre|safe }};
+                                const agrupados = {{ agrupados|safe }};  // datos por jurisdicción
+
+                                const mesActual = new Date().getMonth() + 1;
+
+                                // Función para renderizar cada gráfico por jurisdicción
+                                function renderGraficoPorMes(jurisdiccionId, mesSeleccionado) {
+                                const data = datosPorMes[mesSeleccionado] || [];
+                                const dataFiltrada = data.filter(i => i.n_instancia__c_org_jurisd__x_nom_org_jurisd === jurisdiccionId);
+
+                                // ⛳ ORDENAR ANTES DE MAPEAR
+                                dataFiltrada.sort((a, b) => parseFloat(a.m_avan_meta) - parseFloat(b.m_avan_meta));
+
+                                // AHORA recién crear los arrays desde el arreglo ya ordenado
+                                const labels = dataFiltrada.map(i => i.n_instancia__x_nom_instancia);
+                                const avance = dataFiltrada.map(i => parseFloat(i.m_avan_meta));
+                                const ideal = dataFiltrada.map(i => parseFloat(i.m_ideal_avan_meta));
+                                const nombres_juez = dataFiltrada.map(i => i.juez_nombre);
+
+                                    const colores = avance.map((valor, idx) =>
+                                        valor < ideal[idx] ? 'rgba(255,99,132,0.7)' : 'rgba(75,192,192,0.7)'
+                                    );
+
+                                    const promedioIdeal = ideal.length ? (
+                                        ideal.reduce((a, b) => a + b, 0) / ideal.length
+                                    ) : 55;
+
+                                    const chartId = "graficoPorMes_" + jurisdiccionId.replaceAll(' ', '-').toLowerCase();
+                                    const chart = echarts.init(document.getElementById(chartId));
+
+                                    const option = {
+                                        tooltip: {
+                                            trigger: 'axis',
+                                            axisPointer: { type: 'shadow' },
+                                            formatter: function (params) {
+                                                const idx = params[0].dataIndex;
+                                                return `
+                                                    👨‍⚖️ <b>Juez:</b> ${nombres_juez[idx]}<br/>
+                                                    🏢 <b>${labels[idx]}</b><br/>
+                                                    〽️ <b>Avance:</b> ${avance[idx]}%<br/>
+                                                    📊 <b>Ideal:</b> ${ideal[idx]}%
+                                                `;
+                                            }
+                                        },
+                                        grid: { left: '3%', right: '4%', bottom: '3%', top: 140, containLabel: true },
+                                        xAxis: {
+                                            type: 'value',
+                                            max: 100,
+                                            axisLabel: { formatter: '{value}%' }
+                                        },
+                                        yAxis: {
+                                            type: 'category',
+                                            data: labels,
+                                            axisLabel: {
+                                                formatter: function (value) {
+                                                    return value.length > 20 ? value.slice(0, 20) + '…' : value;
+                                                },
+                                                interval: 0
+                                            }
+                                        },
+                                        series: [{
+                                            type: 'bar',
+                                            data: avance,
+                                            itemStyle: {
+                                                color: function (params) {
+                                                    return colores[params.dataIndex];
+                                                }
+                                            },
+                                            label: {
+                                                show: true,
+                                                position: 'insideRight',
+                                                formatter: '{c}%',
+                                                fontWeight: 'bold',
+                                                color: 'rgb(0,0,0)'
+                                            },
+                                            markLine: {
+                                                symbol: 'none',
+                                                lineStyle: {
+                                                    type: 'dashed',
+                                                    color: '#e57373',
+                                                    width: 2
+                                                },
+                                                label: {
+                                                    show: true,
+                                                    position: 'end',
+                                                    formatter: `Meta Ideal ${promedioIdeal.toFixed(1)}%`,
+                                                    fontWeight: 'bold',
+                                                    color: '#e57373',
+                                                    padding: 4
+                                                },
+                                                data: [{ xAxis: promedioIdeal }]
+                                            }
+                                        }],
+                                        graphic: {
+                                            elements: [
+                                                {
+                                                    type: 'group',
+                                                    left: 'center',
+                                                    top: 10,
+                                                    children: Object.entries(mesesNombre).map(([mes, nombre], idx) => {
+                                                        const col = Math.floor(idx / 4);
+                                                        const row = idx % 4;
+                                                        const isSelected = parseInt(mes) === mesSeleccionado;
+                                                        return {
+                                                            type: 'text',
+                                                            left: col * 100,
+                                                            top: row * 24,
+                                                            style: {
+                                                                text: nombre.toUpperCase(),
+                                                                font: 'bold 12px sans-serif',
+                                                                fill: isSelected ? '#fff' : '#333',
+                                                                backgroundColor: isSelected ? '#e57373' : 'transparent',
+                                                                padding: [4, 8],
+                                                                borderRadius: 4,
+                                                                cursor: 'pointer'
+                                                            },
+                                                            onclick: function () {
+                                                                renderGraficoPorMes(jurisdiccionId, parseInt(mes));
+                                                            }
+                                                        };
+                                                    })
+                                                }
+                                            ]
+                                        }
+                                    };
+
+                                    chart.setOption(option);
+                                    window.addEventListener('resize', () => chart.resize());
+                                    
+                                }
+
+                                // Render inicial para cada jurisdicción
+                                Object.keys(agrupados).forEach((jurisdiccion, idx) => {
+                                    const domId = "{{ forloop.counter|default_if_none:'1' }}"  // si usas id por contador
+                                    renderGraficoPorMes(jurisdiccion, mesActual);
+                                });
+                            });
+                            </script>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+         {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}
+
+   {% block grafico_js %}
+    <script src="{% static 'base/vendor/apex-charts/apexcharts.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
+    <script src="{% static 'base/js/charts-chartjs.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    {% endblock %}

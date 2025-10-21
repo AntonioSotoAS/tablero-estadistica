@@ -1,0 +1,222 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Cuadro Mensual de Metas {{ anio }}{% endblock %}
+
+{% block datatable_css %}
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/dt/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/responsive/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'base/vendor/datatables/checkboxes/datatables.checkboxes.css' %} "/>
+{% endblock  %}
+
+{% block body_container %}
+<style>
+  /* ======== Variables de layout ======== */
+  :root{
+    --w-col-1: 260px;    /* DEPENDENCIA */
+    --w-col-2: 220px;    /* MAGISTRADO(S) */
+     --thead-row-h: 60px;
+  }
+
+  /* ======== Colores de niveles ======== */
+  .niv-muy-bueno { background:#00B050 !important; }
+  .niv-bueno     { background:#FFC000 !important; color:#1f1f1f !important; }
+  .niv-bajo      { background:#FF0000 !important; }
+  .nivel-td      { font-weight:600; }
+
+  /* ======== Contenedor con scroll ======== */
+  .tabla-sticky-wrap{
+    max-height: 70vh;   /* ajusta si deseas más/menos alto */
+    overflow: auto;
+  }
+
+  /* Evita artefactos con sticky en algunas tablas */
+  .tabla-meta{
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+
+  /* ======== Cabeceras sticky (2 filas) ======== */
+  .tabla-meta thead th{
+    position: sticky;
+    z-index: 2;
+    background:#16365C; /* color base cabezera */
+    color:#fff;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .tabla-meta thead tr:nth-child(1) th{ top: 0; z-index: 4; }
+  .tabla-meta thead tr:nth-child(2) th{ top: var(--thead-row-h); z-index: 3; }
+
+  /* Cualquier TH con ROWSPAN (ej. EXPEDIENTES...) se pega arriba y por encima */
+  .tabla-meta thead th[rowspan]{
+    top: 0;
+    z-index: 5;
+    background:#16365C;
+  }
+
+  /* Mes actual (2ª fila) */
+  .tabla-meta thead tr:nth-child(2) th.mes-actual{
+    background:#00B0F0;
+    color:#fff;
+  }
+
+  /* ======== Columnas fijas a la izquierda ======== */
+  /* Col 1: DEPENDENCIA */
+  .tabla-meta thead th.th-sticky-col-1,
+  .tabla-meta tbody td.td-sticky-col-1{
+    position: sticky;
+    left: 0;
+    z-index: 6;
+  }
+  .tabla-meta thead th.th-sticky-col-1{ width: var(--w-col-1); min-width: var(--w-col-1); max-width: var(--w-col-1); }
+  .tabla-meta tbody td.td-sticky-col-1{ width: var(--w-col-1); }
+
+  /* Col 2: MAGISTRADO(S) */
+  .tabla-meta thead th.th-sticky-col-2,
+  .tabla-meta tbody td.td-sticky-col-2{
+    position: sticky;
+    left: var(--w-col-1);
+    z-index: 6;
+  }
+  .tabla-meta thead th.th-sticky-col-2{ width: var(--w-col-2); min-width: var(--w-col-2); max-width: var(--w-col-2); }
+  .tabla-meta tbody td.td-sticky-col-2{ background:#fff; width: var(--w-col-2); }
+
+  /* Intersecciones (thead sticky + col sticky) un poco más arriba */
+  .tabla-meta thead tr:nth-child(1) th.th-sticky-col-1,
+  .tabla-meta thead tr:nth-child(1) th.th-sticky-col-2{ z-index: 8; }
+  .tabla-meta thead tr:nth-child(2) th.th-sticky-col-1,
+  .tabla-meta thead tr:nth-child(2) th.th-sticky-col-2{ z-index: 7; }
+
+  /* ======== Estéticas varias ======== */
+  .tabla-meta th, .tabla-meta td{ padding: .35rem .5rem; }
+  .tabla-meta tbody tr:hover td{ background: #f7f9fc; }
+  .tabla-meta .th-dark   { background: #16365C; color: #fff; }
+  .tabla-meta .th-gray   { background: #595959; color: #fff; }
+  .tabla-meta .th-red    { background: #C00000; color: #fff; }
+  .tabla-meta .th-cyan   { background: #00B0F0; color: #fff; }
+  .tabla-meta .th-blue   { background: #366092; color: #fff; }
+  .tabla-meta .td-beige  { background: #CBC7B4; font-weight:700; }
+  .tabla-meta .td-beige-2{ background: #EAE8DD; font-weight:700; }
+
+  /* Impresión: quita sticky para no recortar */
+  @media print{
+    .tabla-sticky-wrap{ max-height:none; overflow:visible; }
+    .tabla-meta thead th,
+    .tabla-meta tbody td{ position: static !important; }
+  }
+</style>
+
+<div class="container-fluid mt-5">
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h5 class="mb-0">Tipo de procesamiento de la información estadística – {{ anio }}</h5>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="table-responsive tabla-sticky-wrap">
+        <table class="table table-hover table-nowrap tabla-meta align-center">
+          <thead>
+            <tr>
+              <th rowspan="2" class="th-sticky-col-1 th-dark text-center px-2" style="font-size:10px">DEPENDENCIA</th>
+              <th rowspan="2" class="th-sticky-col-2 th-dark text-center px-2" style="font-size:10px">MAGISTRADO(S)</th>
+              <th rowspan="2" class="th-dark text-center px-2" style="font-size:10px">* ESTÁNDAR<br>DE PRODUCCIÓN</th>
+              <th rowspan="2" class="th-red text-center px-2" style="font-size:10px">META <br> PRELIMINAR <br>PROYECTADA <br> {{ anio }}</th>
+              <th rowspan="2" class="th-gray text-center px-2" style="font-size:10px">CARGA <br>PROCESAL <br> INICIAL EN<br>TRÁMITE <br>01/ENE/{{ anio }}</th>
+
+              <!-- ROWSPAN corregido con z-index alto -->
+              <th rowspan="2" class="th-dark th-exp-tramite text-center px-2" style="font-size:10px">
+                EXPEDIENTES <br>RESUELTOS <br>EN TRÁMITE E <br>INGRESADOS <br>A TRÁMITE
+              </th>
+
+              <th colspan="12" class="th-dark text-center px-2" style="font-size:15px">AÑO {{ anio }}</th>
+
+              <th rowspan="2" class="th-dark text-center px-2" style="font-size:10px">TOTAL<br>{{ anio }}</th>
+              <th rowspan="2" class="th-cyan px-2" style="font-size:10px">% REAL <br>DE AVANCE<br> DE META</th>
+              <th rowspan="2" class="th-red px-2 text-center"  style="font-size:10px">% IDEAL <br>DE AVANCE <br>DE META <br>REDONDEADO</th>
+              <th rowspan="2" class="th-dark px-2 text-center" style="font-size:10px">NIVEL<br>PRODUCTIVO</th>
+              <th rowspan="2" class="text-dark fw-bold px-2 text-center" style="background:#FFC000; font-size:10px">CANTIDAD DE <br> EXPEDIENTES <br>PARA NIVEL <br>"BUENO"</th>
+              <th rowspan="2" class="text-dark fw-bold px-2 text-center" style="background:#00B050; font-size:10px">CANTIDAD DE <br>EXPEDIENTES<br>PARA NIVEL <br>"MUY BUENO"</th>
+            </tr>
+
+            <tr>
+  {% now "n" as mes_actual %}
+  {% for m in meses %}
+    <th class="text-center px-2 text-white"
+        style="font-size:10px; background:{% if forloop.counter|stringformat:'d' == mes_actual %}#00B0F0{% else %}#366092{% endif %};">
+      {{ m }}
+    </th>
+  {% endfor %}
+</tr>
+          </thead>
+
+          <tbody>
+            {% for r in filas %}
+
+              {% ifchanged r.modulo_id %}
+              <tr style="background: #0070C0; color: #fff;">
+                <td colspan="{{ colspan }}" class="fw-bold" style="background: #0070C0; color: #fff; font-size:12px">{{ r.modulo_nom }}</td>
+              </tr>
+              {% endifchanged %}
+
+              <!-- RESUELTOS -->
+              <tr>
+                <td rowspan="2" class="td-sticky-col-1" style="font-size:12px">{{ r.instancia }}</td>
+                <td rowspan="2" class="td-sticky-col-2 text-uppercase" style="font-size:12px">{{ r.jueces|default:"-" }}</td>
+
+                <td rowspan="2" class="text-center" style="font-size:12px">{{ r.estandar|default:"-" }}</td>
+                <td rowspan="2" class="text-center text-dark fw-bold" style="font-size:12px; background:#E6B8B7"><b>{{ r.meta_preliminar|default:"-" }}</b></td>
+                <td rowspan="2" class="text-center text-dark fw-bold" style="font-size:12px; background:#CCCCCC">{{ r.carga_inicial|default:"-" }}</td>
+
+                <td class="td-beige text-center" style="font-size:11px;">RESUELTOS</td>
+
+                {% for c in r.res_cells %}
+                  <td class="text-center text-dark {{ c.cls }} nivel-td" title="{{ c.nivel }}">{{ c.val|default:0 }}</td>
+                {% endfor %}
+
+                <td class="text-end fw-bold"><b>{{ r.res_total|default:"0" }}</b></td>
+
+                <td rowspan="2" class="text-dark text-center" style="font-size:12px; background:#B7DEE8">
+                  {% if r.pct_real_avance %}{{ r.pct_real_avance }}%{% else %}-{% endif %}
+                </td>
+                <td rowspan="2" class="text-dark text-center" style="font-size:12px; background:#E6B8B7">
+                  {% if r.pct_ideal_avance %}{{ r.pct_ideal_avance }}%{% else %}-{% endif %}
+                </td>
+
+                <td rowspan="2"
+                    class="text-white text-center"
+                    style="font-size:12px;
+                      {% if r.nivel_prod|upper == 'MUY BUENO' %} background:#00B050;
+                      {% elif r.nivel_prod|upper == 'BUENO' %} background:#FFC000; color:#1f1f1f;
+                      {% elif r.nivel_prod|upper == 'BAJO' %} background:#FF0000; {% endif %}">
+                  {{ r.nivel_prod|default:"-" }}
+                </td>
+
+                <td rowspan="2" class="text-center" style="background:#FFFFCC; font-size:12px">{{ r.niv_bueno|default:"0" }}</td>
+                <td rowspan="2" class="text-center" style="background:#CEEAB0; font-size:12px">{{ r.niv_muy_bueno|default:"0" }}</td>
+              </tr>
+
+              <!-- INGRESOS -->
+              <tr>
+                <td class="td-beige-2 text-center" style="font-size:11px;">INGRESOS</td>
+
+                {% for c in r.ing_cells %}
+                  <td class="text-center nivel-td text-dark" title="{{ c.nivel }}">{{ c.val|default:0 }}</td>
+                {% endfor %}
+                <td class="text-end fw-bold"><b>{{ r.ing_total|default:"0" }}</b></td>
+              </tr>
+
+            {% empty %}
+              <tr>
+                <td colspan="24" class="text-muted" style="font-size:12px">Sin datos para {{ anio }}.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
