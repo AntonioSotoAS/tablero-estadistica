@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-ge6eb4!geczm!qujr6rw$ntpry$7zi!@xu_)^^34c#+n(l8*#+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', '192.168.18.64']
+ALLOWED_HOSTS = ['*', '172.17.78.63']
 AUTH_USER_MODEL = 'bases.usuario'
 
 # Application definition
@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'csjsanta_indicadores',
         'USER': 'root',
-        'PASSWORD':'naruto20',
+        'PASSWORD':'Pj123456*',
         'HOST':'localhost',
         'PORT':3306
     }
